@@ -1,26 +1,19 @@
 .segment "HEADER"
-    .byte "NES"
-    .byte $1a
-    .byte $02
-    .byte $01
-    ; .byte %00000000
-    ; .byte $00
-    ; .byte $00
-    ; .byte $00
-    ; .byte $00
-    ; .byte $00,$00,$00,$00,$00
+    .byte "NES";characters nes  gets converted to hex value $4E $45 $53
+    .byte $1a  ;ms dos end of line character
+    .byte $02  ;2 * 16KB PRG ROM
+    .byte $01  ; 1 * 8KB CHR ROM
+    .byte %00000000 ;flags Mapper, mirroring, battery, trainer
+    .byte $00 ; Mapper, VS/Playchoice, NES 2.0
+    .byte $00 ;PRG-RAM size 
+    .byte %00000001 ;TV system
+    .byte %00000001 ;TV system, PRG-RAM presence    
+    .byte $00,$00,$00,$00,$00 ;filler bytes
 
 .segment "STARTUP"
-.segment "ZEROPAGE"
-flag: .res 1
-counter: .res 1
-
-.segment "CODE"
-
 WAITVBLANK:
-:
     BIT $2002
-    BPL :-
+    BPL WAITVBLANK
     RTS
 
 RESET:
@@ -37,24 +30,36 @@ RESET:
 
   JSR WAITVBLANK
 
+
 clrmem:
   LDA #$00
   STA $0000, x
   STA $0100, x
-  STA $0200, x
+  STA $0300, x
   STA $0400, x
   STA $0500, x
   STA $0600, x
   STA $0700, x
-  LDA #$FE
-  STA $0300, x
+  LDA #$FF
+  STA $0200, x
   INX
   BNE clrmem
 
-  LDA #%10001000
-  STA flag
-   
+ 
+  ;vblank wait
+
   JSR WAITVBLANK
+
+
+.segment "ZEROPAGE"
+flag: .res 1
+counter: .res 1
+
+.segment "CODE"
+
+
+
+
 
 
 
