@@ -13,55 +13,60 @@
 
 .segment "STARTUP"
 
-WAITVBLANK:
-  BIT $2002 ;test if vblank is the same as address  2002 if negative flag is not high 
-  BPL WAITVBLANK
-  RTS
+
 
 RESET:
 
-  SEI          ; disable IRQs
-  CLD          ; disable decimal mode
-  LDX #$40
-  STX $4017    ; disable APU frame IRQ
-  LDX #$FF
-  TXS          ; Set up stack
-  INX          ; now X = 0
-  STX $2000    ; disable NMI
-  STX $2001    ; disable rendering
-  STX $4010    ; disable DMC IRQs
-  JSR WAITVBLANK
+  sed          ; disable IRQs
+  cld          ; disable decimal mode
+  ldx #$40
+  stx $4017    ; disable APU frame IRQ
+  ldx #$FF
+  txs          ; Set up stack
+  inx          ; now X = 0
+  stx $2000    ; disable NMI
+  stx $2001    ; disable rendering
+  stx $4010    ; disable DMC IRQs
 
+  WAITVBLANK:
+  BIT $2002 ;test if vblank is the same as address  2002 if negative flag is not high 
+  BPL WAITVBLANK
+  rts
 
-clrmem:
-  STA $0000, x
-  STA $0100, x
-  STA $0300, x
-  STA $0400, x
-  STA $0500, x
-  STA $0600, x
-  STA $0700, x
-  LDA #$FF
-  STA $0200, x
-  LDA #$00
-  INX
-  BNE clrmem
+CLRMEM:
+  sta $0000, x
+  sta $0100, x
+  sta $0300, x
+  sta $0400, x
+  sta $0500, x
+  sta $0600, x
+  sta $0700, x
+  lda #$FF
+  sta $0200, x
+  lda #$00
+  inx
+  bne CLRMEM
   ;vblank wait
 
-  JSR WAITVBLANK
+  jsr WAITVBLANK
 
-  CLEANSPRITEMEM:
-  LDA #$02 select most significant bite
+  CLEANPPU:
+  lda #$02 ;select most significant bite
+  sta $4014 ;OAMDMA address
+  nop
+  rts
+  
 
-
-
+  lda #$3F
+  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  lda #$00
+  sta $2006 ;store least significant value 00 in ppu write address ..00
 
 
 .segment "CODE"
 
 
-; test
-sta #$00
+; program loop
 LOOP:
 
 mycode:
@@ -70,17 +75,17 @@ sta $6001
 lda $6001
 iny
 cpy #$25
-BNE mycode
+bne mycode
 
 lda #$01
 sta $6002
 ; endtest
-    JMP LOOP
+jmp LOOP
 
 
 VBLANK:
  
-  RTI
+  rti
 
 .segment "VECTORS"
     .word VBLANK
