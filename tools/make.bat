@@ -1,10 +1,12 @@
 set filename=nes
-set outputName=game
+set outputname=game
 
-if exist ../bin/%outputName%.nes del ../bin/%outputName%.nes
-ca65 ../code/%filename%.asm -o ../bin/%filename%.o -t nes --debug-info
-ld65 ../bin/%filename%.o -o ../bin/%outputName%.nes -t nes 
-sim65 ../bin/%filename%.o
-if exist ..\bin\game.o del ..\bin\game.o
-if exist ..\bin\game.nes  ..\bin\game.nes
+
+del .\bin\game.nes
+echo %filename%
+ca65 ./code/nes.asm -o ./bin/nes.o -t nes --debug-info
+ld65 ./bin/nes.o -o ./bin/game.nes -t nes --dbgfile ./bin/game.dbg
+
+del .\bin\nes.o
+
 

@@ -4,15 +4,19 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+
+        
+
         {
             "type": "alchemy65",
             "request": "launch",
             "name": "Debug rom with mesen",
-            "romPath": "${workspaceFolder}/game.nes",
-            "dbgPath": "${workspaceFolder}/game.dbg",
-            "program": "${workspaceFolder}/path/to/mesen.exe",
+            "romPath": "${workspaceFolder}/bin/game.nes",
+            "dbgPath": "${workspaceFolder}/bin/game.dbg",
+            "program": "F:/Users/Floortje/Documents/emulators/Mesen-x/Mesen-x.exe",
             "sourcePath": "${workspaceFolder}/",
-            "stopOnEntry": true,
+            "stopOnEntry": false,
             "resetOnEntry": true
         }
     ]
