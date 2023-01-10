@@ -123,22 +123,21 @@ ldx #$00
 ldy #$00
 
 LOOP:
- jsr WAITVBLANK
-txa
+jsr WAITVBLANK
+tya
 sta $0200
 sta $0204
 adc #$08
 sta $0208
-adc #$08
 sta $020c
 
-tya
+txa
 sta $0203
 adc #$08
 sta $0207
 sbc #$07
 sta $020B
-adc #$08
+adc #$07
 sta $020F
 
 iny
