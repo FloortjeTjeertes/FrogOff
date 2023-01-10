@@ -194,8 +194,7 @@ DISPLAY_BACKGROUND:
   inx         ; increment the X register
   cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
   bne :-
-   ldx #$00    ; load the value 0 into the X register
-
+  ldx #$00    ; load the value 0 into the X register
    :
   lda MAPDATA+765,x   ; load the value at the address stored in X and Y into the accumulator
   sta $2007   ; store the value in the PPU data register (0x2007)
@@ -203,6 +202,14 @@ DISPLAY_BACKGROUND:
   cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
   bne :-
   
+  ldx #$00    ; load the value 0 into the X register
+    :
+  lda MAPDATA+1020,x   ; load the value at the address stored in X and Y into the accumulator
+  sta $2007   ; store the value in the PPU data register (0x2007)
+  inx         ; increment the X register
+  cpx #$05 ; compare X with the value 4096 (the size of a nametable in bytes)
+  bne :-
+ 
 
   cli
 
@@ -257,7 +264,7 @@ VBLANK: ;nmi or vblank what happens in the vblank
 
 
 PALLETEDATA:
-  .byte $01,$2D,$3D,$30,$01,$36,$17,$0f,$01,$30,$21,$0f,$01,$27,$17,$0F  ;background palette data
+  .byte $00,$00,$10,$20,$06,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
   .byte $22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
 
 SPRITEDATA:
