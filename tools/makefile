@@ -1,7 +1,10 @@
-rm ../bin/game.nes
-ca65 ../code/nes.asm -o ../bin/game.o -t nes
-ld65 ../bin/game.o -o ../bin/game.nes -t nes
-rm ../bin/game.o
+asm = ca65
+link = ld65
 
-ca65 ../blinktest.asm -o ../game.o -t nes
-ld65 ../game.o -o ../game.nes -t nes
+
+target: 
+	$(asm) ../code/nes.asm -o ../bin/game.o -t nes
+	$(link) ../bin/game.o -o ../bin/game.nes -t nes
+clean: 
+	rm ../bin/game.nes
+	rm ../bin/game.o
