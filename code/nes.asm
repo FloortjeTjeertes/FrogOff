@@ -12,14 +12,16 @@
 
 
 JOYPAD1 = $4016
-JOYPAD2 = $4017
-
 
 .zeropage
-buttons: .res 1
+buttons: .res 1 ; 1 byte for buttons
+
+
+
 
 
 .segment "STARTUP"
+
 
 jsr WAITVBLANK
 
@@ -117,14 +119,12 @@ LOADBACKGROUND:
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
   sta $2001
 
+.segment "CODE"
 
-
-
-;
 ;program loop
 
 
-jsr DISPLAY_BACKGROUND
+  jsr DISPLAYBACKGROUND
 
 
 
@@ -132,7 +132,38 @@ ldx #$00
 ldy #$00
 
 LOOP:
+  lda DOWN ;enable sprites and backgrounds for left most 8 pixels
+  and buttons
+  cmp DOWN
+  beq MOVEDOWN
+
+  lda UP ;enable sprites and backgrounds for left most 8 pixels
+  and buttons
+  cmp UP
+  beq MOVEUP
+ LABEL:
+ jsr MOVEBLOCK
+
+jmp LOOP
+
+MOVEDOWN:
+  iny
+  jmp LABEL
+
+MOVEUP:
+  dey
+  jmp LABEL
+
+
+MOVEBLOCK:
+ 
+ 
+
 jsr WAITVBLANK
+
+
+
+  
 tya
 sta $0200
 sta $0204
@@ -140,22 +171,29 @@ adc #$08
 sta $0208
 sta $020c
 
+; adc #$01
+; sta $0208
+; sta $020c 
+
+
+
 txa
 sta $0203
+sta $020B
 adc #$08
 sta $0207
-sbc #$07
-sta $020B
-adc #$07
 sta $020F
 
-iny
-inx
-
-jmp LOOP
 
 
-DISPLAY_BACKGROUND:
+ 
+; ldx #$00
+; ldy #$00
+
+rts
+
+
+DISPLAYBACKGROUND:
 
 
   lda #%00000000   ;enable sprites and backgrounds for left most 8 pixels
@@ -229,8 +267,7 @@ DISPLAY_BACKGROUND:
 rts
 
 
-
-test:
+BACKGROUNDFLICKER:
   lda #$3F
   sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
@@ -251,19 +288,19 @@ test:
 rts
 
 
-
-READJOY:
-                  ; store first bit for checking if full controlelr is shifted in
-    lda #$01
-    sta JOYPAD1
-    sta buttons
-    lsr a      
-    sta JOYPAD1
-      :            ;shift in a controller bit and store it in the buttons variable
-      lda JOYPAD1
-      lsr a	       
-      rol buttons  ;rotate the buttons variable to the left
-      bcc :-       ;if carry is clear, jump to the next bit 
+;shifts 1 every loop until 8 bits are shifted from the nes controller
+;the status of the controller is stored every loop in the buttons
+READCONTROLLER: 
+    lda #$01 
+    sta JOYPAD1 ;write 1 to joypad 1
+    sta buttons ;write 1 to buttons
+    lsr a   ; shifts 1 out of acumulator to make acumulator 0
+    sta JOYPAD1 ;write aculumator (0) to joypad 1 (clears strobe bit and controller will keep stored value (pressed buttons) static
+      :                                                                    
+      lda JOYPAD1 ;read joypad 1 into acumulator                           
+      lsr a ;shift left shifts red byte to form a full 8 bits of the read controller                                                
+      rol buttons ;shift left to eventually put 1 in carry (looping trough all bits in the buttons variable)      
+      bcc :- ;branch to last ":" if carry flag is not set
 rts
 
 
@@ -277,32 +314,51 @@ CLEANPPU:
 WAITVBLANK:
   BIT $2002 ;test if vblank is the same as address  2002 if negative flag is not high 
   BPL WAITVBLANK
+
   rts
 
 
 VBLANK: ;nmi or vblank what happens in the vblank
   LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
+  jsr READCONTROLLER
   rti
 
 
 
+
+AButton:
+.byte %10000000
+BButton:
+.byte %01000000
+SELECT: 
+.byte %00100000
+START:  
+.byte %00010000
+UP:     
+.byte %00001000
+DOWN:   
+.byte %00000100
+LEFT:   
+.byte %00000010
+RIGHT:  
+.byte %00000001
 PALLETEDATA:
-  .byte $00,$00,$10,$20,$06,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
-  .byte $22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
+  .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
+  .byte $0D,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
 
 SPRITEDATA:
-  .byte $09, $9a, $02, $00
-  .byte $09, $9b, $02, $08
-  .byte $11, $aa, $02, $00
-  .byte $11, $ab, $02, $08
-  .byte $19, $9c, $07, $00
-  .byte $19, $9d, $07, $08
-  .byte $21, $ac, $07, $00
-  .byte $21, $ad, $07, $08
+  .byte $08, $9a, $02, $00
+  .byte $08, $9b, $02, $08
+  .byte $10, $aa, $02, $00
+  .byte $10, $ab, $02, $08
+  .byte $18, $9c, $07, $00
+  .byte $18, $9d, $07, $08
+  .byte $20, $ac, $07, $00
+  .byte $20, $ad, $07, $08
 
 MAPDATA:
- .incbin "../resource/testColored.nam"
+ .incbin "../resource/test.nam"
 
 
 .segment "VECTORS"
