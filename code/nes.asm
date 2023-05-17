@@ -10,6 +10,15 @@
     .byte $00 ;TV system, PRG-RAM presence   
     .byte $46, $52,$31,$4C,$59
 
+
+JOYPAD1 = $4016
+JOYPAD2 = $4017
+
+
+.zeropage
+buttons: .res 1
+
+
 .segment "STARTUP"
 
 jsr WAITVBLANK
@@ -115,7 +124,7 @@ LOADBACKGROUND:
 ;program loop
 
 
-  jsr DISPLAY_BACKGROUND
+jsr DISPLAY_BACKGROUND
 
 
 
@@ -243,6 +252,21 @@ rts
 
 
 
+READJOY:
+                  ; store first bit for checking if full controlelr is shifted in
+    lda #$01
+    sta JOYPAD1
+    sta buttons
+    lsr a      
+    sta JOYPAD1
+      :            ;shift in a controller bit and store it in the buttons variable
+      lda JOYPAD1
+      lsr a	       
+      rol buttons  ;rotate the buttons variable to the left
+      bcc :-       ;if carry is clear, jump to the next bit 
+rts
+
+
 
 CLEANPPU:
   lda #$02 ;select most significant bite
@@ -278,7 +302,7 @@ SPRITEDATA:
   .byte $21, $ad, $07, $08
 
 MAPDATA:
- .incbin "../resource/test.nam"
+ .incbin "../resource/testColored.nam"
 
 
 .segment "VECTORS"
