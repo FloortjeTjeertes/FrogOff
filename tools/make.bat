@@ -4,9 +4,11 @@ set outputname=game
 
 del ..\bin\game.nes
 echo %filename%
-ca65 ../code/nes.asm -o ../bin/nes.o -t nes --debug-info
-ld65 ../bin/nes.o -o ../bin/game.nes -t nes --dbgfile ../bin/game.dbg
+ca65.exe ../code/nes.asm -o ../bin/game.o -t nes --debug-info
+ld65.exe ../bin/game.o -o ../bin/game.nes -t nes --dbgfile ../bin/game.dbg
 
-del ..\bin\nes.o
+mesen.exe ../bin/game.nes --debugger --trace 
+
+del ..\bin\game.o
 
 

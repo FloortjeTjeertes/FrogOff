@@ -11,14 +11,16 @@
     .byte $46, $52,$31,$4C,$59
 
 
+
+
 JOYPAD1 = $4016
+
+
+
+
 
 .zeropage
 buttons: .res 1 ; 1 byte for buttons
-
-
-
-
 
 .segment "STARTUP"
 
@@ -82,8 +84,6 @@ LOADPALETTES:
   cpx #$20
   bne LOADPALETTES
 
-
-
   ldx #$00
   
 LOADSPRITES:
@@ -132,6 +132,7 @@ ldx #$00
 ldy #$00
 
 LOOP:
+
   lda DOWN ;enable sprites and backgrounds for left most 8 pixels
   and buttons
   cmp DOWN
@@ -141,7 +142,20 @@ LOOP:
   and buttons
   cmp UP
   beq MOVEUP
+
+  lda LEFT ;enable sprites and backgrounds for left most 8 pixels
+  and buttons
+  cmp LEFT
+  beq MOVELEFT
+
+  lda RIGHT ;enable sprites and backgrounds for left most 8 pixels
+  and buttons
+  cmp RIGHT
+  beq MOVERIGHT
+
+
  LABEL:
+ tya
  jsr MOVEBLOCK
 
 jmp LOOP
@@ -154,13 +168,19 @@ MOVEUP:
   dey
   jmp LABEL
 
+MOVERIGHT:
+  inx
+  jmp LABEL
+
+MOVELEFT:
+  dex
+  jmp LABEL
 
 MOVEBLOCK:
  
  
 
 jsr WAITVBLANK
-
 
 
   
