@@ -21,6 +21,8 @@ JOYPAD1 = $4016
 
 .zeropage
 buttons: .res 1 ; 1 byte for buttons
+counter: .res 1 
+
 
 .segment "STARTUP"
 
@@ -44,6 +46,9 @@ RESET:
   stx $2000    ; disable NMI
   stx $2001    ; disable rendering
   stx $4010    ; disable DMC IRQs
+  
+  lda #$00    ;store 0 in acumulator to clear counter
+  sta counter ;store acumulator in counter (should be 0)
 
   jsr WAITVBLANK
 
@@ -86,12 +91,12 @@ LOADPALETTES:
 
   ldx #$00
   
-LOADSPRITES:
-  lda SPRITEDATA,x
-  sta $0200,x
-  inx
-  cpx #$20
-  bne LOADSPRITES
+
+
+  jsr LOADSPRITES
+
+
+
 
 
 LOADBACKGROUND:
@@ -103,11 +108,11 @@ LOADBACKGROUND:
 
   ldx #$00   ;load x with 0
 
-:
-  txa       ;transfer x to acumulator
-  sta $2007 ;stores acumulator in ppu address 2007
-  inx
-  cpx #$CE ;compare x with 255
+  :
+    txa       ;transfer x to acumulator
+    sta $2007 ;stores acumulator in ppu address 2007
+    inx
+    cpx #$CE ;compare x with 255
   bne :-
 
 
@@ -128,90 +133,146 @@ LOADBACKGROUND:
 
 
 
-ldx #$00
-ldy #$00
+  ldx #$00
+  ldy #$00
 
 LOOP:
 
-  lda DOWN ;enable sprites and backgrounds for left most 8 pixels
+ 
+
+  jsr CHECKBUTTONS
+
+
+
+  
+jmp LOOP
+
+CHECKBUTTONS:
+  lda DOWN 
   and buttons
   cmp DOWN
   beq MOVEDOWN
 
-  lda UP ;enable sprites and backgrounds for left most 8 pixels
+  lda UP
   and buttons
   cmp UP
   beq MOVEUP
 
-  lda LEFT ;enable sprites and backgrounds for left most 8 pixels
+  lda LEFT 
   and buttons
   cmp LEFT
   beq MOVELEFT
 
-  lda RIGHT ;enable sprites and backgrounds for left most 8 pixels
+  lda RIGHT 
   and buttons
   cmp RIGHT
   beq MOVERIGHT
 
-
- LABEL:
- tya
- jsr MOVEBLOCK
-
-jmp LOOP
+  rts
 
 MOVEDOWN:
   iny
-  jmp LABEL
+  jmp MOVE
 
 MOVEUP:
   dey
-  jmp LABEL
+  jmp MOVE
 
 MOVERIGHT:
   inx
-  jmp LABEL
+  jmp MOVE
 
 MOVELEFT:
   dex
-  jmp LABEL
+  jmp MOVE
 
-MOVEBLOCK:
- 
- 
+MOVE:
+  jsr MOVEBLOCK
 
-jsr WAITVBLANK
-
-
-  
-tya
-sta $0200
-sta $0204
-adc #$08
-sta $0208
-sta $020c
-
-; adc #$01
-; sta $0208
-; sta $020c 
-
-
-
-txa
-sta $0203
-sta $020B
-adc #$08
-sta $0207
-sta $020F
-
-
-
- 
-; ldx #$00
-; ldy #$00
+  jsr WAITVBLANK
 
 rts
 
+
+LOAD_META_SPRITE:
+  ; Load meta sprite patterns
+  ldx #$00         ; Initialize X register
+
+  ; Load meta sprite tiles
+  lda META_LOOKUP_TABLE, x      ;store length first
+  sta $01                     
+  lda META_LOOKUP_TABLE+1, x   ; then load the tile data
+  sta $00           
+
+  ldy #$00         ; Initialize Y register
+  ldx #$00         ; Initialize X register
+
+  ; Load each tile of the meta sprite
+  LOAD_TILE:
+
+
+    lda META_POSITION_DATA, y   ; Load the Y position data
+    sta $0200,y                   ; Store the Y position in the OAM address register
+
+    ; Load the tile data, attributes, and X position
+    lda META_TILE_DATA, y       ; Load the tile data
+    sta $0201,y                ; Store the tile data in the $0200 range
+
+    lda META_COLOR_DATA, y      ; Load the attribute data
+    sta $0202,y                ; Store the attribute data in the $0200 range
+
+    lda META_POSITION_DATA+1, y ; Load the X position data
+    sta $0203,y                ; Store the X position in the $0200 range
+
+    iny                         ; Increment Y register to load the next position/tile
+                             
+    inx                         ; Increment X register to load the next tile
+
+    cpx $01                     ;check if the sprite has the length of the meta sprite
+                        
+  bne LOAD_TILE                 ; If not, continue loading tiles
+
+
+
+ 
+
+rts
+
+
+LOADSPRITES:
+  jsr LOAD_META_SPRITE   ; Initialize meta sprites
+
+  ; Load regular sprites
+  ; ldx #$00
+  ; :
+  ; lda SPRITEDATA,x
+  ; sta $0200,x
+  ; inx
+  ; cpx #$20
+  ; bne :-
+
+rts
+
+
+MOVEBLOCK:  ;move  the block sprite  (change it later to work whit any character that needs to be moved)
+
+  tya
+  sta $0200
+  sta $0204
+  adc #$08
+  sta $0208
+  sta $020c
+
+
+  txa
+  sta $0203
+  sta $020B
+  adc #$08
+  sta $0207
+  sta $020F
+
+
+rts
 
 DISPLAYBACKGROUND:
 
@@ -286,7 +347,6 @@ DISPLAYBACKGROUND:
 
 rts
 
-
 BACKGROUNDFLICKER:
   lda #$3F
   sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
@@ -307,7 +367,6 @@ BACKGROUNDFLICKER:
 
 rts
 
-
 ;shifts 1 every loop until 8 bits are shifted from the nes controller
 ;the status of the controller is stored every loop in the buttons
 READCONTROLLER: 
@@ -316,11 +375,11 @@ READCONTROLLER:
     sta buttons ;write 1 to buttons
     lsr a   ; shifts 1 out of acumulator to make acumulator 0
     sta JOYPAD1 ;write aculumator (0) to joypad 1 (clears strobe bit and controller will keep stored value (pressed buttons) static
-      :                                                                    
+    :                                                                    
       lda JOYPAD1 ;read joypad 1 into acumulator                           
       lsr a ;shift left shifts red byte to form a full 8 bits of the read controller                                                
       rol buttons ;shift left to eventually put 1 in carry (looping trough all bits in the buttons variable)      
-      bcc :- ;branch to last ":" if carry flag is not set
+    bcc :- ;branch to last ":" if carry flag is not set
 rts
 
 
@@ -348,34 +407,28 @@ VBLANK: ;nmi or vblank what happens in the vblank
 
 
 AButton:
-.byte %10000000
+ .byte %10000000
 BButton:
-.byte %01000000
+ .byte %01000000
 SELECT: 
-.byte %00100000
+ .byte %00100000
 START:  
-.byte %00010000
+ .byte %00010000
 UP:     
-.byte %00001000
+ .byte %00001000
 DOWN:   
-.byte %00000100
+ .byte %00000100
 LEFT:   
-.byte %00000010
+ .byte %00000010
 RIGHT:  
-.byte %00000001
+ .byte %00000001
+
+.include "metasprites.asm"
+
 PALLETEDATA:
   .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
   .byte $0D,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
 
-SPRITEDATA:
-  .byte $08, $9a, $02, $00
-  .byte $08, $9b, $02, $08
-  .byte $10, $aa, $02, $00
-  .byte $10, $ab, $02, $08
-  .byte $18, $9c, $07, $00
-  .byte $18, $9d, $07, $08
-  .byte $20, $ac, $07, $00
-  .byte $20, $ad, $07, $08
 
 MAPDATA:
  .incbin "../resource/test.nam"
