@@ -1,15 +1,4 @@
-@REM set filename=nes
-@REM set outputname=game
 
-
-@REM del ..\bin\game.nes
-@REM echo %filename%
-@REM ca65.exe ../code/nes.asm -o ../bin/game.o -t nes --debug-info
-@REM ld65.exe ../bin/game.o -o ../bin/game.nes -t nes --dbgfile ../bin/game.dbg
-
-@REM mesen.exe ../bin/game.nes --debugger --trace 
-
-@REM del ..\bin\game.o
 
 
 @echo off

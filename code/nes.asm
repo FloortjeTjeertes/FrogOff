@@ -14,7 +14,7 @@
 
 
 JOYPAD1 = $4016
-
+JOYPAD2 = $4017
 
 
 
@@ -22,6 +22,7 @@ JOYPAD1 = $4016
 .zeropage
 buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
+metaSprite: .res 1
 
 
 .segment "STARTUP"
@@ -136,6 +137,9 @@ LOADBACKGROUND:
   ldx #$00
   ldy #$00
 
+
+  
+
 LOOP:
 
  
@@ -193,42 +197,60 @@ MOVE:
 
 rts
 
-
+;$00 index of the meta sprite
+;$01 length of the meta sprite
 LOAD_META_SPRITE:
-  ; Load meta sprite patterns
-  ldx #$00         ; Initialize X register
+  
 
+
+  ; Load meta sprite patterns
+  ldx metaSprite               ; Initialize X register
+  ldx 00
   ; Load meta sprite tiles
   lda META_LOOKUP_TABLE, x      ;store length first
   sta $01                     
   lda META_LOOKUP_TABLE+1, x   ; then load the tile data
   sta $00           
 
-  ldy #$00         ; Initialize Y register
-  ldx #$00         ; Initialize X register
+  ldy #$00                     ; Initialize Y register
+  ldx #$00                     ; Initialize X register
+  ;set index
+    L1:
+      L2:
+        inx
+        cpx $01
+      bne L2
+      iny
+      cpy metaSprite
+    bne L1 
+
+  ldy #$00                     ; Initialize Y register
+
 
   ; Load each tile of the meta sprite
   LOAD_TILE:
 
 
-    lda META_POSITION_DATA, y   ; Load the Y position data
-    sta $0200,y                   ; Store the Y position in the OAM address register
+    lda META_POSITION_DATA_Y, y   ; Load the Y position data
+    sta $0200,x                   ; Store the Y position in the OAM address register
 
-    ; Load the tile data, attributes, and X position
     lda META_TILE_DATA, y       ; Load the tile data
-    sta $0201,y                ; Store the tile data in the $0200 range
+    sta $0201,x                  ; Store the tile data in the $0200 range
 
-    lda META_COLOR_DATA, y      ; Load the attribute data
-    sta $0202,y                ; Store the attribute data in the $0200 range
+    lda META_ATRIBUTE_DATA, y      ; Load the attribute data
+    sta $0202,x                 ; Store the attribute data in the $0200 range
 
-    lda META_POSITION_DATA+1, y ; Load the X position data
-    sta $0203,y                ; Store the X position in the $0200 range
+    lda META_POSITION_DATA_X, y ; Load the X position data
+    sta $0203,x                 ; Store the X position in the $0200 range
 
     iny                         ; Increment Y register to load the next position/tile
                              
     inx                         ; Increment X register to load the next tile
+    inx
+    inx
+    inx                      
 
-    cpx $01                     ;check if the sprite has the length of the meta sprite
+    cpy $01                     ;check if the sprite has the length of the meta sprite
                         
   bne LOAD_TILE                 ; If not, continue loading tiles
 
@@ -240,16 +262,11 @@ rts
 
 
 LOADSPRITES:
+  lda #$00 
+  sta metaSprite
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
 
-  ; Load regular sprites
-  ; ldx #$00
-  ; :
-  ; lda SPRITEDATA,x
-  ; sta $0200,x
-  ; inx
-  ; cpx #$20
-  ; bne :-
+
 
 rts
 
@@ -259,7 +276,7 @@ MOVEBLOCK:  ;move  the block sprite  (change it later to work whit any character
   tya
   sta $0200
   sta $0204
-  adc #$08
+  adc #$07
   sta $0208
   sta $020c
 
@@ -267,7 +284,7 @@ MOVEBLOCK:  ;move  the block sprite  (change it later to work whit any character
   txa
   sta $0203
   sta $020B
-  adc #$08
+  adc #$07
   sta $0207
   sta $020F
 
@@ -427,7 +444,7 @@ RIGHT:
 
 PALLETEDATA:
   .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
-  .byte $0D,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
+  .byte $0D,$09,$29,$39,$0D,$08,$09,$3D,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
 
 
 MAPDATA:
