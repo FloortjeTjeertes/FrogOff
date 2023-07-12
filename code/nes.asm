@@ -23,6 +23,8 @@ JOYPAD2 = $4017
 buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
 metaSpriteIndex: .res 1
+metaSpriteSlot: .res 1
+
 Meta_Sprite_Start_Adress_first_byte: .res 1
 Meta_Sprite_Start_Adress_last_byte: .res 1
 metaSpriteLength: .res 1
@@ -127,7 +129,7 @@ LOADBACKGROUND:
 ;enable interupts
   cli
 
-  lda #%10000000 ;enable nmi change background to use second char set
+  lda #%10001000 ;enable nmi change background to use second char set
   sta $2000  ;PPUCTRL ppu controll register
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
   sta $2001
@@ -191,8 +193,6 @@ ABUTTON:
   ; jsr LOAD_META_SPRITE
 rts
 
-
-
 MOVEDOWN:
   iny
   jmp MOVE
@@ -234,11 +234,9 @@ NextMetaSPrite:
 rts
 
 
-
-
-
-;$00 index of the meta sprite
-;$01 length of the meta sprite
+; $00 index of the meta sprite
+; $01 length of the meta sprite
+; metaSpriteSlot is the place from where the tile data is stored in the oam
 LOAD_META_SPRITE:
   ; Load meta sprite patterns
   ldy #$00
@@ -262,16 +260,16 @@ LOAD_META_SPRITE:
   ldx metaSpriteIndex               ; Initialize X register
   ldy #$00
 
-  :
-    cpy metaSpriteIndex
-    beq :+ ;if x is 0 skip the next line
+  ; :
+  ;   cpy metaSpriteIndex
+  ;   beq :+ ;if x is 0 skip the next line
 
-    inx 
-    inx 
-    iny 
-    jmp :- ;jump to the start of the loop
+  ;   inx 
+  ;   inx 
+  ;   iny 
+  ;   jmp :- ;jump to the start of the loop
 
-  :
+  ; :
 
   ; Load meta sprite tiles
   lda META_LOOKUP_TABLE, x      ;store length first
@@ -281,27 +279,34 @@ LOAD_META_SPRITE:
   lda META_LOOKUP_TABLE+2, x   ; load the first part of where the tile data is stored
   sta Meta_Sprite_Start_Adress_first_byte           
 
-  ;  get the length meta sprites that is before it in the list to get the ofset
+  ;ofsets the full metasprite in the oam
+  SetSpriteSlot:
+  ldy #$00                     ; Initialize Y register
+  ldx #$00                     ; Initialize X register
+  :
+       cpy metaSpriteLength
+       bne :+
+       inx 
+     
+       jmp :-  ;jump to the start of the loop
+  :            ; end of ser sprite slot
+      
+  
+
+  ;  get the length meta sprites that is before it in the list to get the ofset\
   lda metaOffset
   tay
+  clc 
   adc metaSpriteLength
   sta metaSpriteLength
-  dec metaSpriteLength       ; remove 1 from the length of the meta sprite for 0 based index
 
-  ; lda metaSpriteIndex
-  ; cmp #$00
-  ; beq :+
-  ;   lda META_LOOKUP_TABLE-3 , x
-  ;   tay 
-  ;   adc metaSpriteLength                        
-  ;   sta metaSpriteLength
-  ;   dec metaSpriteLength       ; remove 1 from the length of the meta sprite for 0 based index
+ 
 
-  ; :  
+  
+ 
 
+  
 
-
-  ldx #$00                     ; Initialize X register
   LOAD_TILE:
 
   
@@ -321,9 +326,9 @@ LOAD_META_SPRITE:
 
                              
     inx  ; Increment X register to load the next tile
-    inx
-    inx
-    inx
+    inx 
+    inx 
+    inx 
 
     tya 
     sbc Meta_Sprite_Start_Adress_last_byte                                                  ; remove address from y                 
@@ -340,10 +345,12 @@ LOAD_META_SPRITE:
 
 rts
 
+; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
-  lda #$01 
+  lda #$00 
   sta metaSpriteIndex
+  sta metaSpriteSlot
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
 
 
@@ -525,7 +532,7 @@ RIGHT:
 
 PALLETEDATA:
   .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
-  .byte $1F,$09,$29,$0D,$1F,$08,$09,$0D,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
+  .byte $1F,$09,$29,$3A,$1F,$08,$09,$0D,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
 
 
 MAPDATA:
@@ -537,5 +544,5 @@ MAPDATA:
     .word RESET
 
 .segment "CHARS"  
-      .incbin "../resource/elementzones.chr"
-      
+      .incbin "../resource/PlatformSprites.chr"
+      .incbin "../resource/MovingSprites.chr"
