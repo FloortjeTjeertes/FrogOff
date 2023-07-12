@@ -1,10 +1,10 @@
-metaSpriteIndex: .res 1
-metaSpriteSlot: .res 1
+; metaSpriteIndex: .res 1
+; metaSpriteSlot: .res 1
 
-Meta_Sprite_Start_Adress_first_byte: .res 1
-Meta_Sprite_Start_Adress_last_byte: .res 1
-metaSpriteLength: .res 1
-metaOffset: .res 1
+; Meta_Sprite_Start_Adress_first_byte: .res 1
+; Meta_Sprite_Start_Adress_last_byte: .res 1
+; metaSpriteLength: .res 1
+; metaOffset: .res 1
 
 ;$00 index of the meta sprite
 ;$01 length of the meta sprite
