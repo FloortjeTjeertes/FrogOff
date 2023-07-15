@@ -1,19 +1,25 @@
-; metaSpriteIndex: .res 1
-; metaSpriteSlot: .res 1
-
-; Meta_Sprite_Start_Adress_first_byte: .res 1
-; Meta_Sprite_Start_Adress_last_byte: .res 1
-; metaSpriteLength: .res 1
-; metaOffset: .res 1
-
-;$00 index of the meta sprite
-;$01 length of the meta sprite
-;metaSpriteSlot is the place from where the tile data is stored in the oam
-
 ; $00 index of the meta sprite
 ; $01 length of the meta sprite
 ; metaSpriteSlot is the place from where the tile data is stored in the oam
-LOAD_META_SPRITE:
+.export  LOAD_META_SPRITE
+
+.zeropage
+  .exportzp  metaSpriteIndex := $00
+  .exportzp  metaSpriteSlot := $01
+
+  ; local variables
+  Meta_Sprite_Start_Adress_first_byte: .res 1
+  Meta_Sprite_Start_Adress_last_byte: .res 1
+  metaSpriteLength: .res 1
+  metaOffset: .res 1
+
+.segment "CODE"
+.proc LOAD_META_SPRITE
+
+
+
+
+
   ; Load meta sprite patterns
   ldy #$00
   ldx #$00
@@ -57,15 +63,18 @@ LOAD_META_SPRITE:
 
   ;ofsets the full metasprite in the oam
   SetSpriteSlot:
-  ldy #$00                     ; Initialize Y register
-  ldx #$00                     ; Initialize X register
+  ; Initialize Y register
+  ; Initialize X register
+  ldy #$00                    
+  ldx #$00                     
   :
        cpy metaSpriteLength
        bne :+
        inx 
-     
-       jmp :-  ;jump to the start of the loop
-  :            ; end of ser sprite slot
+
+       ;jump to the start of the loop
+       jmp :- 
+  :    
       
   
 
@@ -76,47 +85,51 @@ LOAD_META_SPRITE:
   adc metaSpriteLength
   sta metaSpriteLength
 
- 
-
-  
- 
-
-  
 
   LOAD_TILE:
 
-  
-    lda META_TILE_DATA, y                ; Load the tile data
-    sta $0201,x                  ; Store the tile data in the $0200 range
+    ; Load the tile data
+    ; Store the tile data in the $0200 range
+    lda META_TILE_DATA, y              
+    sta $0201,x                  
 
+    ; Load the Y position data
+    ; Store the Y position in the OAM address register
+    lda META_POSITION_DATA_Y, y   
+    sta $0200,x                  
 
-    lda META_POSITION_DATA_Y, y   ; Load the Y position data
-    sta $0200,x                   ; Store the Y position in the OAM address register
+    ; Load the attribute data
+    ; Store the attribute data in the $0200 range
+    lda META_ATRIBUTE_DATA, y      
+    sta $0202,x                 
 
+    ; Load the X position data
+    ; Store the X position in the $0200 range
+    lda META_POSITION_DATA_X, y 
+    sta $0203,x                 
 
-    lda META_ATRIBUTE_DATA, y      ; Load the attribute data
-    sta $0202,x                 ; Store the attribute data in the $0200 range
-
-    lda META_POSITION_DATA_X, y ; Load the X position data
-    sta $0203,x                 ; Store the X position in the $0200 range
-
-                             
-    inx  ; Increment X register to load the next tile
+    ; Increment X register to load the next tile                          
+    inx  
     inx 
     inx 
     inx 
 
     tya 
-    sbc Meta_Sprite_Start_Adress_last_byte                                                  ; remove address from y                 
+
+    ; remove address from y  
+    sbc Meta_Sprite_Start_Adress_last_byte  
+
+    ; Increment Y register to load the next position/tile
+    ;check if the sprite has the length of the meta sprite
+    iny                                                           
+    cpy    metaSpriteLength                  
+
+  ; If not, continue loading tiles    
+  bne LOAD_TILE                
+
+  rts
 
 
-    iny                                                        ; Increment Y register to load the next position/tile     
-    cpy    metaSpriteLength                  ;check if the sprite has the length of the meta sprite
-                        
-  bne LOAD_TILE                 ; If not, continue loading tiles
+  .include "metasprites.asm"
 
-
-
- 
-
-rts
+.endproc

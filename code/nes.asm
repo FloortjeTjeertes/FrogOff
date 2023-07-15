@@ -16,19 +16,23 @@
 JOYPAD1 = $4016
 JOYPAD2 = $4017
 
+; .include "loadMetaSprite.asm"
 
 
 
 .zeropage
+
 buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
-metaSpriteIndex: .res 1
-metaSpriteSlot: .res 1
+; metaSpriteIndex: .res 1
+; metaSpriteSlot: .res 1
+.importzp metaSpriteSlot
+.importzp metaSpriteIndex
 
-Meta_Sprite_Start_Adress_first_byte: .res 1
-Meta_Sprite_Start_Adress_last_byte: .res 1
-metaSpriteLength: .res 1
-metaOffset: .res 1
+; Meta_Sprite_Start_Adress_first_byte: .res 1
+; Meta_Sprite_Start_Adress_last_byte: .res 1
+; metaSpriteLength: .res 1
+; metaOffset: .res 1
 ; /test
 SpriteCounter: .res 1 
 
@@ -134,7 +138,12 @@ LOADBACKGROUND:
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
   sta $2001
 
+
+
 .segment "CODE"
+
+.import LOAD_META_SPRITE
+
 
 ;program loop
   jsr DISPLAYBACKGROUND
@@ -218,24 +227,24 @@ rts
 
 ; test code for meta sprites
 NextMetaSPrite:
-  ldx SpriteCounter
-  cpx tablelength
-  beq @l
-   inx  
-   jmp @l2
-  @l:
-   ldx #$0
-  @l2:
-  stx SpriteCounter
-  txa
+  ; ldx SpriteCounter
+  ; cpx tablelength
+  ; beq @l
+  ;  inx  
+  ;  jmp @l2
+  ; @l:
+  ;  ldx #$0
+  ; @l2:
+  ; stx SpriteCounter
+  ; txa
 
-  sta  metaSpriteIndex
-  jsr LOAD_META_SPRITE
+  ; sta  metaSpriteIndex
+  ; jsr LOAD_META_SPRITE
 rts
 
 
 
-.include "loadMetaSprite.asm"
+; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
   lda #$00 
@@ -399,7 +408,6 @@ VBLANK: ;nmi or vblank what happens in the vblank
 
 
 
-
 AButton:
  .byte %10000000
 BButton:
@@ -418,7 +426,8 @@ RIGHT:
  .byte %00000001
 
 
-.include "metasprites.asm"
+; .include "metasprites.asm"
+  ; .include "metasprites.asm"
 
 PALLETEDATA:
   .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
