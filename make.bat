@@ -58,6 +58,9 @@ echo tempfile.txt
 
 REM Link the object files into an NES ROM
 echo Linking "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
+
+@REm make linking dynamic
+
 @REM "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
 "tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o  -o    bin/game.nes -t nes --dbgfile bin\game.dbg
 if errorlevel 1 (
