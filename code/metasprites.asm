@@ -37,13 +37,13 @@ META_POSITION_DATA_X:
   ; Individual positions for each part of the meta sprite
   .byte $00, $08, $00, $08 
   .byte $00, $08, $00, $08    
-  .byte $00, $08, $10, $18, $20, $28, $30, $38, $40, $48, $50, $58 ,$60, $68     
+  .byte $00, $08, $10, $18, $20, $28, $30, $00, $08, $10, $18, $20 ,$28, $30     
 
 META_POSITION_DATA_Y:
   ; Individual positions for each part of the meta sprite
   .byte $00, $00, $08, $08
   .byte $00, $00, $08, $08
-  .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00     
+  .byte $00, $00, $00, $00, $00, $00, $00, $08, $08, $08, $08, $08, $08, $08     
 
 
 

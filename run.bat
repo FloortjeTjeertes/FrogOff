@@ -1,1 +1,1 @@
-"tools\mesen.exe" ../bin/game.nes --debugger --trace
+"tools\mesen.exe" ./bin/game.nes --debugger --trace
