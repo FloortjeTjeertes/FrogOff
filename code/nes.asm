@@ -24,15 +24,14 @@ JOYPAD2 = $4017
 
 buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
+ram: .res 1
+
 ; metaSpriteIndex: .res 1
 ; metaSpriteSlot: .res 1
 .importzp metaSpriteSlot
 .importzp metaSpriteIndex
 
-; Meta_Sprite_Start_Adress_first_byte: .res 1
-; Meta_Sprite_Start_Adress_last_byte: .res 1
-; metaSpriteLength: .res 1
-; metaOffset: .res 1
+
 ; /test
 SpriteCounter: .res 1 
 
@@ -160,8 +159,6 @@ LOOP:
 
   jsr CHECKBUTTONS
 
-
-
   
 jmp LOOP
 
@@ -249,10 +246,15 @@ rts
 LOADSPRITES:
   lda #$00 
   sta metaSpriteIndex
+  lda #$00
   sta metaSpriteSlot
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
 
-
+  lda #$02 
+  sta metaSpriteIndex
+  lda #$01
+  sta metaSpriteSlot
+  jsr LOAD_META_SPRITE 
 
 rts
 
@@ -355,10 +357,10 @@ BACKGROUNDFLICKER:
   sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
   sta $2006 
-  ldx $0000
+  ldx ram
   inx
-  stx $0000
-  lda $0000
+  stx ram
+  lda ram
   sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
   lda #$26
   sta $2007
@@ -385,8 +387,6 @@ READCONTROLLER:
     bcc :- ;branch to last ":" if carry flag is not set
 rts
 
-
-
 CLEANPPU:
   lda #$02 ;select most significant bite
   sta $4014 ;OAMDMA address
@@ -404,7 +404,8 @@ VBLANK: ;nmi or vblank what happens in the vblank
   LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
   jsr READCONTROLLER
-  rti
+
+rti
 
 
 
@@ -426,8 +427,7 @@ RIGHT:
  .byte %00000001
 
 
-; .include "metasprites.asm"
-  ; .include "metasprites.asm"
+
 
 PALLETEDATA:
   .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data

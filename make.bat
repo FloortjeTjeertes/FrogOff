@@ -1,28 +1,4 @@
 
-@REM @echo off
-
-@REM set filename=nes
-@REM set outputname=game
-
-@REM del ..\bin\game.nes
-
-@REM echo %filename%
-
-@REM "tools/ca65.exe" /code/nes.asm -o ../bin/game.o -t nes --debug-info
-@REM if not errorlevel 1 (
-@REM     echo Compilation successful.
-@REM     "tools/ld65.exe" /bin/game.o -o ../bin/game.nes -t nes --dbgfile ../bin/game.dbg
-@REM     if not errorlevel 1 (
-@REM         echo Linking successful.
-@REM         "tools/mesen.exe" /bin/game.nes --debugger --trace
-@REM     ) else (
-@REM         echo Linking failed.
-@REM     )
-@REM ) else (
-@REM     echo Compilation failed.
-@REM )
-
-@REM del ..\bin\game.o
 
 
 @echo off
@@ -59,7 +35,7 @@ echo tempfile.txt
 REM Link the object files into an NES ROM
 echo Linking "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
 
-@REm make linking dynamic
+@REM make linking dynamic
 
 @REM "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
 "tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o  -o    bin/game.nes -t nes --dbgfile bin\game.dbg

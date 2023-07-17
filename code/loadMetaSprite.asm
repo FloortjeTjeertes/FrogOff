@@ -12,12 +12,12 @@
   Meta_Sprite_Start_Adress_last_byte: .res 1
   metaSpriteLength: .res 1
   metaOffset: .res 1
+  temp: .res 1
 
 .segment "CODE"
 .proc LOAD_META_SPRITE
 
-
-
+  
 
 
   ; Load meta sprite patterns
@@ -27,31 +27,23 @@
   ;get the offset of the meta sprite
   getLengOfsetOfSprite:
     cpy  metaSpriteIndex               ; Initialize X register
-    beq :+
+    beq :+ 
     inx 
     inx 
-    inx 
-    inx 
+    inx   
     iny 
+    inc metaOffset
+    inc metaOffset
+    inc metaOffset
+    inc metaOffset
+
   jmp getLengOfsetOfSprite
   :
-  stx metaOffset
 
 
   ;set up the offset of the meta sprite lookup table
-  ldx metaSpriteIndex               ; Initialize X register
+  ; ldx metaSpriteIndex               ; Initialize X register
   ldy #$00
-
-  ; :
-  ;   cpy metaSpriteIndex
-  ;   beq :+ ;if x is 0 skip the next line
-
-  ;   inx 
-  ;   inx 
-  ;   iny 
-  ;   jmp :- ;jump to the start of the loop
-
-  ; :
 
   ; Load meta sprite tiles
   lda META_LOOKUP_TABLE, x      ;store length first
@@ -62,25 +54,41 @@
   sta Meta_Sprite_Start_Adress_first_byte           
 
   ;ofsets the full metasprite in the oam
-  SetSpriteSlot:
   ; Initialize Y register
   ; Initialize X register
   ldy #$00                    
-  ldx #$00                     
-  :
-       cpy metaSpriteLength
-       bne :+
-       inx 
+  ldx #$00 
+  lda #$00
+  sta temp
 
-       ;jump to the start of the loop
-       jmp :- 
-  :    
-      
+  SetSpriteSlot:
+    clc 
+    cpy metaSpriteSlot
+    beq EndSetSpriteSlot 
+    ldx #$00       
+      :
+         lda temp
+         clc 
+         cpx metaSpriteLength
+         beq :+
+         inx  
+         inc temp
+         inc temp
+         inc temp
+         inc temp
+         ;jump to the start of the loop
+         jmp :- 
+      :    
+    iny 
+    jmp SetSpriteSlot
+  EndSetSpriteSlot:    
+  tax  
+    
   
 
   ;  get the length meta sprites that is before it in the list to get the ofset\
   lda metaOffset
-  tay
+  tay 
   clc 
   adc metaSpriteLength
   sta metaSpriteLength
