@@ -131,19 +131,14 @@
     ; lda META_TILE_DATA, x    
     lda (Meta_Sprite_Start_Adress_last_byte),y         
     sta $0201,x  
-
-                
-
     ; Load the Y position data
     ; Store the Y position in the OAM address register
     lda (MetaSpriteYPositionAdress),y         
     sta $0200,x                  
-
     ; Load the attribute data
     ; Store the attribute data in the $0200 range
     lda (MetaSpriteAtributeAdress),y         
     sta $0202,x                 
-
     ; Load the X position data
     ; Store the X position in the $0200 range
     lda (MetaSpriteXPositionAdress),y         
