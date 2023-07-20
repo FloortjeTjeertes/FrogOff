@@ -24,6 +24,8 @@ JOYPAD2 = $4017
 
 buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
+Xpos: .res 1
+Ypos: .res 1
 ram: .res 1
 
 ; metaSpriteIndex: .res 1
@@ -155,7 +157,7 @@ LOADBACKGROUND:
 
 LOOP:
 
- 
+
 
   jsr CHECKBUTTONS
 
@@ -244,17 +246,24 @@ rts
 ; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
-  lda #$00 
+  lda #$01 
   sta metaSpriteIndex
   lda #$00
   sta metaSpriteSlot
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
 
-  lda #$02 
-  sta metaSpriteIndex
-  lda #$01
-  sta metaSpriteSlot
-  jsr LOAD_META_SPRITE 
+  ; lda #$02 
+  ; sta metaSpriteIndex
+  ; lda #$01
+  ; sta metaSpriteSlot
+  ; jsr LOAD_META_SPRITE 
+
+  ; lda #$03 
+  ; sta metaSpriteIndex
+  ; lda #$00
+  ; sta metaSpriteSlot
+  ; jsr LOAD_META_SPRITE 
+
 
 rts
 
@@ -430,8 +439,8 @@ RIGHT:
 
 
 PALLETEDATA:
-  .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
-  .byte $1F,$09,$29,$3A,$1F,$08,$09,$0D,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
+  .byte $00,$00,$10,$20, $07,$16,$25,$30, $00,$21,$31,$30, $00,$27,$06,$00  ;background palette data
+  .byte $1F,$09,$29,$3A, $1F,$08,$09,$0D, $1F,$30,$10,$2D, $1F,$30,$3C,$2D  ;sprite palette data
 
 
 MAPDATA:
