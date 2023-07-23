@@ -159,6 +159,7 @@ LOOP:
 
 
 
+
   jsr CHECKBUTTONS
 
   
@@ -194,11 +195,7 @@ CHECKBUTTONS:
   rts
 
 ABUTTON:
- jsr WAITVBLANK
- jsr NextMetaSPrite
-  ; lda #$01
-  ; sta metaSpriteIndex
-  ; jsr LOAD_META_SPRITE
+
 rts
 
 MOVEDOWN:
@@ -225,20 +222,28 @@ MOVE:
 rts
 
 ; test code for meta sprites
-NextMetaSPrite:
-  ; ldx SpriteCounter
-  ; cpx tablelength
-  ; beq @l
-  ;  inx  
-  ;  jmp @l2
-  ; @l:
-  ;  ldx #$0
-  ; @l2:
-  ; stx SpriteCounter
-  ; txa
+FlyAnimate:
+  lda counter 
+  and #$10
+  cmp #$00
+  beq :+
 
-  ; sta  metaSpriteIndex
-  ; jsr LOAD_META_SPRITE
+  lda #$03 
+  sta metaSpriteIndex
+  lda #$02
+  sta metaSpriteSlot
+  jsr LOAD_META_SPRITE   ; Initialize meta sprites
+  jmp @END
+  :
+
+  lda #$04 
+  sta metaSpriteIndex
+  lda #$02
+  sta metaSpriteSlot
+  jsr LOAD_META_SPRITE   ; Initialize meta sprites
+  
+  @END:
+   
 rts
 
 
@@ -246,17 +251,22 @@ rts
 ; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
+
   lda #$03 
   sta metaSpriteIndex
-  lda #$00
+  lda #$02
   sta metaSpriteSlot
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
 
-  ; lda #$02 
-  ; sta metaSpriteIndex
-  ; lda #$01
-  ; sta metaSpriteSlot
-  ; jsr LOAD_META_SPRITE 
+   ; Initialize meta sprites
+
+
+
+  lda #$00 
+  sta metaSpriteIndex
+  lda #$00
+  sta metaSpriteSlot
+  jsr LOAD_META_SPRITE 
 
   ; lda #$03 
   ; sta metaSpriteIndex
@@ -413,7 +423,8 @@ VBLANK: ;nmi or vblank what happens in the vblank
   LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
   jsr READCONTROLLER
-
+  jsr FlyAnimate
+  inc counter
 rti
 
 
