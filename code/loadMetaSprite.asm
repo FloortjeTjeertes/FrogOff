@@ -32,14 +32,28 @@
   getLengthOfsetOfSprite:
     cpy  metaSpriteIndex               ; Initialize X register
     beq :+ 
+    ; increment once for the length
+    inx 
+    ;increment 2 times for the tilde data adress
     inx 
     inx 
-    inx   
+    ;increment 2 times for the atributes
+    inx 
+    inx 
+    ;increment 2 times for the x position
+    inx 
+    inx 
+    ;increment 2 times for the y position
+    inx 
+    inx 
+    ;increment 1 time for the next meta sprite
     iny 
-    inc metaOffset
-    inc metaOffset
-    inc metaOffset
-    inc metaOffset
+
+    ;increment the offset for one full oam tile (4 bytes)
+    ; inc metaOffset
+    ; inc metaOffset
+    ; inc metaOffset
+    ; inc metaOffset
 
   jmp getLengthOfsetOfSprite
   :
@@ -111,24 +125,17 @@
   
 
   ;  get the length meta sprites that is before it in the list to get the ofset\
-  lda metaOffset
-  tax 
-  clc 
-  adc metaSpriteLength
-  sta metaSpriteLength
-
+  ; lda metaOffset
+   
+  ; clc 
+  ; adc metaSpriteLength
+  ; sta metaSpriteLength
+  ldy #$00
 
   LOAD_TILE:
 
-
-    ; \test 
-    
-   
-   
-
     ; Load the tile data
     ; Store the tile data in the $0200 range
-    ; lda META_TILE_DATA, x    
     lda (Meta_Sprite_Start_Adress_last_byte),y         
     sta $0201,x  
     ; Load the Y position data
@@ -153,6 +160,7 @@
     ; Increment y register to load the next position/tile
     ;check if the sprite has the length of the meta sprite
     iny                                                           
+
     cpy    metaSpriteLength                  
 
   ; If not, continue loading tiles    

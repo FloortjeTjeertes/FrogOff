@@ -246,7 +246,7 @@ rts
 ; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
-  lda #$01 
+  lda #$03 
   sta metaSpriteIndex
   lda #$00
   sta metaSpriteSlot
