@@ -26,16 +26,17 @@ buttons: .res 1 ; 1 byte for buttons
 counter: .res 1 
 Xpos: .res 1
 Ypos: .res 1
+
 ram: .res 1
 
-; metaSpriteIndex: .res 1
-; metaSpriteSlot: .res 1
+
 .importzp metaSpriteSlot
 .importzp metaSpriteIndex
 
 
-; /test
-SpriteCounter: .res 1 
+
+
+
 
 
 
@@ -108,31 +109,13 @@ LOADPALETTES:
   
 
 
-  jsr LOADSPRITES
+  ; jsr LOADSPRITES
 
 
 
 
 
-LOADBACKGROUND:
 
-  lda #$20    ;load 20 into acumulator
-  sta $2006   ;stores most significant byte in ppu
-  lda #$00   ;stores least sugnificant byte in acumulator 
-  sta $2006   ;stores least significant byte in ppu
-
-  ldx #$00   ;load x with 0
-
-  :
-    txa       ;transfer x to acumulator
-    sta $2007 ;stores acumulator in ppu address 2007
-    inx
-    cpx #$CE ;compare x with 255
-  bne :-
-
-
-;enable interupts
-  cli
 
   lda #%10001000 ;enable nmi change background to use second char set
   sta $2000  ;PPUCTRL ppu controll register
@@ -143,11 +126,11 @@ LOADBACKGROUND:
 
 .segment "CODE"
 
-.import LOAD_META_SPRITE
 
 
 ;program loop
-  jsr DISPLAYBACKGROUND
+
+  
 ; clear c and y
   ldx #$00
   ldy #$00
@@ -159,11 +142,22 @@ LOOP:
 
 
 
+  jsr TITLESCREEN
+
+
+
 
   jsr CHECKBUTTONS
 
   
 jmp LOOP
+
+
+.import LOAD_META_SPRITE
+
+.import LOADBACKGROUND
+
+.import TITLESCREEN
 
 CHECKBUTTONS:
   lda DOWN 
@@ -199,19 +193,19 @@ ABUTTON:
 rts
 
 MOVEDOWN:
-  iny
+  inc Ypos
   jmp MOVE
 
 MOVEUP:
-  dey
+  dec Ypos
   jmp MOVE
 
 MOVERIGHT:
-  inx
+  inc Xpos
   jmp MOVE
 
 MOVELEFT:
-  dex
+  dec Xpos
   jmp MOVE
 
 MOVE:
@@ -224,7 +218,7 @@ rts
 ; test code for meta sprites
 FlyAnimate:
   lda counter 
-  and #$10
+  and #$07
   cmp #$00
   beq :+
 
@@ -236,19 +230,15 @@ FlyAnimate:
   jmp @END
   :
 
-  lda #$04 
-  sta metaSpriteIndex
-  lda #$02
-  sta metaSpriteSlot
+    lda #$04 
+    sta metaSpriteIndex
+    lda #$02
+    sta metaSpriteSlot
   jsr LOAD_META_SPRITE   ; Initialize meta sprites
   
   @END:
    
 rts
-
-
-
-; .include "loadMetaSprite.asm"
 
 LOADSPRITES:
 
@@ -256,11 +246,7 @@ LOADSPRITES:
   sta metaSpriteIndex
   lda #$02
   sta metaSpriteSlot
-  jsr LOAD_META_SPRITE   ; Initialize meta sprites
-
-   ; Initialize meta sprites
-
-
+  jsr LOAD_META_SPRITE   
 
   lda #$00 
   sta metaSpriteIndex
@@ -298,78 +284,6 @@ MOVEBLOCK:  ;move  the block sprite  (change it later to work whit any character
 
 rts
 
-DISPLAYBACKGROUND:
-
-
-  lda #%00000000   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
-  sei
-
-  lda #$28
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
-  lda #$C0
-  sta $2006 ;store least significant value 00 in ppu write address ..00
-
-  ldx #$00
-  
-
-  lda #$20    ; load the value 32 into the accumulator
-  sta $2006   ; store the most significant byte in the PPU write address (0x2006)
-  lda #$00    ; load the value 0 into the accumulator
-  sta $2006   ; store the least significant byte in the PPU write address (0x2006)
-  
-  ldx #$00    ; load the value 0 into the X register
-
-  
-  :
-  lda MAPDATA,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-
- ldx #$00    ; load the value 0 into the X register
-
-
-  :
-  lda MAPDATA+255,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-   
- ldx #$00    ; load the value 0 into the X register
-
-  :
-  lda MAPDATA+510,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-  ldx #$00    ; load the value 0 into the X register
-   :
-  lda MAPDATA+765,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-  
-  ldx #$00    ; load the value 0 into the X register
-    :
-  lda MAPDATA+1020,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$05 ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
- 
-
-  cli
-
-  lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
- 
-
-rts
 
 BACKGROUNDFLICKER:
   lda #$3F
@@ -419,11 +333,13 @@ WAITVBLANK:
   rts
 
 
+
+
 VBLANK: ;nmi or vblank what happens in the vblank
   LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
   jsr READCONTROLLER
-  jsr FlyAnimate
+  ; jsr FlyAnimate
   inc counter
 rti
 
@@ -450,11 +366,12 @@ RIGHT:
 
 
 PALLETEDATA:
-  .byte $00,$00,$10,$20, $07,$16,$25,$30, $00,$21,$31,$30, $00,$27,$06,$00  ;background palette data
+  .byte $00,$00,$10,$20, $07,$16,$25,$30, $00,$21,$31,$30, $00,$09,$19,$29  ;background palette data
   .byte $1F,$09,$29,$3A, $1F,$08,$09,$0D, $1F,$30,$10,$2D, $1F,$30,$3C,$2D  ;sprite palette data
 
 
 MAPDATA:
+ .incbin "../resource/titleScreen.nam"
  .incbin "../resource/test.nam"
 
 
