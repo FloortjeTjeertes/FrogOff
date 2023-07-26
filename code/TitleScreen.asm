@@ -42,15 +42,15 @@ OptionSteps = 18
     jsr LOAD_META_SPRITE
 
     lda $0200
-    adc #$99
+    adc #$9a
     sta $0200
     
     lda $0204
-    adc #$99
+    adc #$9a
     sta $0204
 
     lda $0208
-    adc #$99
+    adc #$9a
     sta $0208
 
 
