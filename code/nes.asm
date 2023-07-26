@@ -23,13 +23,13 @@ JOYPAD2 = $4017
 .zeropage
  .importzp metaSpriteSlot
  .importzp metaSpriteIndex
- .globalzp buttons
+ .globalzp buttons, Mode
 
   buttons: .res 1 ; 1 byte for buttons
   counter: .res 1 
   Xpos: .res 1
   Ypos: .res 1
-
+  Mode: .res 1
   ram: .res 1
 
 
@@ -262,6 +262,9 @@ READCONTROLLER:
     bcc :- ;branch to last ":" if carry flag is not set
 rts
 
+
+
+
 CLEANPPU:
   lda #$02 ;select most significant bite
   sta $4014 ;OAMDMA address
@@ -284,6 +287,7 @@ VBLANK: ;nmi or vblank what happens in the vblank
   ; jsr FlyAnimate
   inc counter
 rti
+
 
 .global AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 AButton:

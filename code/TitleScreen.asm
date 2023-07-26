@@ -7,6 +7,7 @@ OptionSteps = 18
     .importzp metaSpriteSlot
     .importzp metaSpriteIndex
     .importzp buttons
+    .exportzp Mode
 
     BackgroundLoaded: .res 1
     Loaded: .res 1
@@ -92,6 +93,7 @@ OptionSteps = 18
  rts 
  
  StartOption:
+   Mode
  rts 
 
  
@@ -147,6 +149,7 @@ OptionSteps = 18
 
  rts
 
+ 
  
 
 .endproc
