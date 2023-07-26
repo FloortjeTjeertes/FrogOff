@@ -21,17 +21,18 @@ JOYPAD2 = $4017
 
 
 .zeropage
+ .importzp metaSpriteSlot
+ .importzp metaSpriteIndex
+ .globalzp buttons
 
-buttons: .res 1 ; 1 byte for buttons
-counter: .res 1 
-Xpos: .res 1
-Ypos: .res 1
+  buttons: .res 1 ; 1 byte for buttons
+  counter: .res 1 
+  Xpos: .res 1
+  Ypos: .res 1
 
-ram: .res 1
+  ram: .res 1
 
 
-.importzp metaSpriteSlot
-.importzp metaSpriteIndex
 
 
 
@@ -107,15 +108,6 @@ LOADPALETTES:
 
   ldx #$00
   
-
-
-  ; jsr LOADSPRITES
-
-
-
-
-
-
 
   lda #%10001000 ;enable nmi change background to use second char set
   sta $2000  ;PPUCTRL ppu controll register
@@ -209,10 +201,7 @@ MOVELEFT:
   jmp MOVE
 
 MOVE:
-  jsr MOVEBLOCK
-
   jsr WAITVBLANK
-
 rts
 
 ; test code for meta sprites
@@ -239,52 +228,6 @@ FlyAnimate:
   @END:
    
 rts
-
-LOADSPRITES:
-
-  lda #$03 
-  sta metaSpriteIndex
-  lda #$02
-  sta metaSpriteSlot
-  jsr LOAD_META_SPRITE   
-
-  lda #$00 
-  sta metaSpriteIndex
-  lda #$00
-  sta metaSpriteSlot
-  jsr LOAD_META_SPRITE 
-
-  ; lda #$03 
-  ; sta metaSpriteIndex
-  ; lda #$00
-  ; sta metaSpriteSlot
-  ; jsr LOAD_META_SPRITE 
-
-
-rts
-
-
-MOVEBLOCK:  ;move  the block sprite  (change it later to work whit any character that needs to be moved)
-
-  tya
-  sta $0200
-  sta $0204
-  adc #$07
-  sta $0208
-  sta $020c
-
-
-  txa
-  sta $0203
-  sta $020B
-  adc #$08
-  sta $0207
-  sta $020F
-
-
-rts
-
-
 BACKGROUNDFLICKER:
   lda #$3F
   sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
@@ -304,7 +247,6 @@ BACKGROUNDFLICKER:
   cpx #$3f
 
 rts
-
 ;shifts 1 every loop until 8 bits are shifted from the nes controller
 ;the status of the controller is stored every loop in the buttons
 READCONTROLLER: 
@@ -343,8 +285,7 @@ VBLANK: ;nmi or vblank what happens in the vblank
   inc counter
 rti
 
-
-
+.global AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 AButton:
  .byte %10000000
 BButton:
@@ -368,7 +309,6 @@ RIGHT:
 PALLETEDATA:
   .byte $00,$00,$10,$20, $07,$16,$25,$30, $00,$21,$31,$30, $00,$09,$19,$29  ;background palette data
   .byte $1F,$09,$29,$3A, $1F,$08,$09,$0D, $1F,$30,$10,$2D, $1F,$30,$3C,$2D  ;sprite palette data
-
 
 MAPDATA:
  .incbin "../resource/titleScreen.nam"
