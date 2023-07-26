@@ -23,22 +23,13 @@ JOYPAD2 = $4017
 .zeropage
  .importzp metaSpriteSlot
  .importzp metaSpriteIndex
- .globalzp buttons, Mode
+ .globalzp buttons
 
   buttons: .res 1 ; 1 byte for buttons
   counter: .res 1 
   Xpos: .res 1
   Ypos: .res 1
-  Mode: .res 1
   ram: .res 1
-
-
-
-
-
-
-
-
 
 
 .segment "STARTUP"
@@ -314,9 +305,11 @@ PALLETEDATA:
   .byte $00,$00,$10,$20, $07,$16,$25,$30, $00,$21,$31,$30, $00,$09,$19,$29  ;background palette data
   .byte $1F,$09,$29,$3A, $1F,$08,$09,$0D, $1F,$30,$10,$2D, $1F,$30,$3C,$2D  ;sprite palette data
 
-MAPDATA:
- .incbin "../resource/titleScreen.nam"
- .incbin "../resource/test.nam"
+
+
+; MAPDATA:
+;  .incbin "../resource/titleScreen.nam"
+;  .incbin "../resource/test.nam"
 
 
 .segment "VECTORS"

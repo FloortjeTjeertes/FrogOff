@@ -12,6 +12,7 @@ OptionSteps = 18
     BackgroundLoaded: .res 1
     Loaded: .res 1
     Options: .res 1
+    Mode: .res 1
 
 .segment "CODE"
    .import LOADBACKGROUND
@@ -93,7 +94,9 @@ OptionSteps = 18
  rts 
  
  StartOption:
-   Mode
+   ldx Options
+   inx 
+   stx Mode
  rts 
 
  
