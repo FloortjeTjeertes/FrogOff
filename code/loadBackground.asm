@@ -35,12 +35,12 @@ GetBackgroundFromArray:
 
 rts
 
-
+ldy #$00
 LoadBackgroundPalletes:
   lda (PalleteAdress), y
   sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
   iny 
-  cpy #$20
+  cpy #$10
   bne LoadBackgroundPalletes
 rts
 
