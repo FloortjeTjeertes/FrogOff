@@ -20,17 +20,18 @@ PalleteAdress: .word 2
 
 rts
 
+;uses x as index to get the background from the array
 GetBackgroundFromArray:
 
-  ; make this use the table
-  lda #<MAPDATA
+
+  lda BACKGROUNDLIST, x
   sta MapDataAddress
-  lda #>MAPDATA
+  lda BACKGROUNDLIST+1, x
   sta MapDataAddress+1
 
-  lda #<PALLETE
+  lda BACKGROUNDLIST+2, x
   sta PalleteAdress
-  lda #>PALLETE
+  lda BACKGROUNDLIST+3, x
   sta PalleteAdress+1
 
 rts
@@ -158,7 +159,7 @@ SetBackground:
  
 rts
 
-.include "backgrounds.asm"
+.include "Lists/backgrounds.asm"
 
 
 .endproc

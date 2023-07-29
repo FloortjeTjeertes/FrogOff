@@ -1,4 +1,4 @@
-BackgoundList:
+BACKGROUNDLIST:
     .addr MAPDATA
     .addr PALLETE
 
@@ -6,10 +6,10 @@ BackgoundList:
 
 ;==============================================================================
 MAPDATA:
- .incbin "../resource/titleScreen.nam"
+ .incbin "../../resource/nameTables/titleScreen.nam"
 
 PALLETE:
- .incbin "../resource/TitleScreenPallete.bin"
+ .incbin "../../resource/palletes/TitleScreenPallete.bin"
 
 
 

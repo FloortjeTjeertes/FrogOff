@@ -31,6 +31,7 @@ OptionSteps = 18
    rts 
  
  LOAD:
+    ldx #$00 
     jsr LOADBACKGROUND
 
     lda #$01

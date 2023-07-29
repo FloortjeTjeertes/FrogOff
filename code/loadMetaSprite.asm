@@ -169,6 +169,6 @@
   rts
 
 
-  .include "metasprites.asm"
+  .include "Lists/metasprites.asm"
 
 .endproc

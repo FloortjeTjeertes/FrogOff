@@ -117,16 +117,19 @@ CLRMEM:
 LOOP:
 
   lda Mode
-  cmp #$01
-  beq :+
+  cmp #$00
+  bne :+
    jsr TITLESCREEN
   :
   lda Mode
-  cmp #$02
-  beq :+
+  cmp #$01
+  bne :+
     jsr SINGLEPLAYER
   :
-
+  cmp #$02
+  bne :+
+    jsr SINGLEPLAYER
+  :
 
   jsr CHECKBUTTONS
 
@@ -309,5 +312,5 @@ RIGHT:
     .word VBLANK
     .word RESET
 .segment "CHARS"  
-      .incbin "../resource/PlatformSprites.chr"
-      .incbin "../resource/MovingSprites.chr"
+      .incbin "../resource/Tiles/PlatformSprites.chr"
+      .incbin "../resource/Tiles/MovingSprites.chr"
