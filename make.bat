@@ -3,7 +3,7 @@
 
 @echo off
 
-set outputname=game
+set outputname=nes
 set objfile=bin\%outputname%.o
 set outnes=bin\%outputname%.nes
 set OfileList=
@@ -38,7 +38,7 @@ echo Linking "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outp
 @REM make linking dynamic
 
 @REM "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
-"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o  -o    bin/game.nes -t nes --dbgfile bin\game.dbg
+"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o bin/SinglePlayer.o bin/Debug.o -o    bin/%outputname%.nes -t nes --dbgfile bin\%outputname%.dbg
 if errorlevel 1 (
     echo Linking failed.
     REM Remove the temporary file
@@ -52,4 +52,3 @@ start "" "tools\Mesen.exe" %outnes% --debugger --trace
 
 REM Cleanup: Delete the object file
 del %objfile%
-DEL "tempfile.txt"

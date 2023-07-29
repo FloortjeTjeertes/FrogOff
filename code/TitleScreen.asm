@@ -28,8 +28,7 @@ OptionSteps = 18
     
     jsr ControllerAction
 
- rts
-
+   rts 
  
  LOAD:
     jsr LOADBACKGROUND
@@ -99,7 +98,6 @@ OptionSteps = 18
    stx Mode
  rts 
 
- 
  NextOption:
     lda Options
     cmp #$01
@@ -134,7 +132,7 @@ OptionSteps = 18
 
 
   
- rts
+ rts 
 
  PreviousFlyOption:
     lda $0200
@@ -150,10 +148,10 @@ OptionSteps = 18
     sta $0208
 
 
- rts
+ rts 
 
  
- 
+    
 
 .endproc
 

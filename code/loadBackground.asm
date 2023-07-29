@@ -7,8 +7,8 @@ PPUMASK = $2001
 
 .zeropage
 
-MapDataAddress: .res 2
-PalleteAdress: .res 2
+MapDataAddress: .word 2
+PalleteAdress: .word 2
 
 .segment "CODE"
 .proc LOADBACKGROUND
@@ -37,11 +37,22 @@ rts
 
 ldy #$00
 LoadBackgroundPalletes:
+
+
+
   lda (PalleteAdress), y
   sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
   iny 
   cpy #$10
   bne LoadBackgroundPalletes
+
+   lda #$3F
+  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  lda #$00
+  sta $2006 ;store least significant value 00 in ppu write address ..00
+  sta $2006 ;store least significant value 00 in ppu write address ..00
+  sta $2006 ;store least significant value 00 in ppu write address ..00
+
 rts
 
 Increase:
