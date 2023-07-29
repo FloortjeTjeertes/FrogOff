@@ -15,7 +15,10 @@
 
 JOYPAD1 = $4016
 JOYPAD2 = $4017
-
+PPUSCROLL = $2005
+PPUADDR = $2006
+PPUDATA = $2007
+PPUMASK = $2001
 ; .include "loadMetaSprite.asm"
 
 
@@ -24,13 +27,14 @@ JOYPAD2 = $4017
  .importzp metaSpriteSlot
  .importzp Mode
  .importzp metaSpriteIndex
- .globalzp buttons
+ .globalzp buttons , RenderStatus
 
   buttons: .res 1 ; 1 byte for buttons
   counter: .res 1 
   Xpos: .res 1
   Ypos: .res 1
   ram: .res 1
+  RenderStatus: .res 1
 
 
 .segment "STARTUP"
@@ -128,7 +132,7 @@ LOOP:
   :
   cmp #$02
   bne :+
-    jsr SINGLEPLAYER
+    jsr DEBUG
   :
 
   jsr CHECKBUTTONS
@@ -269,6 +273,10 @@ rts
 VBLANK: ;nmi or vblank what happens in the vblank
   LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
+
+  lda RenderStatus
+  sta PPUMASK ;enable/disable rendering
+
   jsr READCONTROLLER
   ; jsr FlyAnimate
   inc counter
@@ -281,6 +289,8 @@ SELECTGAMEMODE:
        lda GAMEMODES,x
        pha
 rts
+
+
 
 GAMEMODES:
   .word TITLESCREEN-1 , SINGLEPLAYER-1, DEBUG-1

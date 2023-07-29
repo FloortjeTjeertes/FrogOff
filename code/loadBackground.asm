@@ -5,24 +5,36 @@ PPUADDR = $2006
 PPUDATA = $2007
 PPUMASK = $2001
 
-.zeropage
 
-MapDataAddress: .word 2
-PalleteAdress: .word 2
-
-.segment "CODE"
 .proc LOADBACKGROUND
+ .zeropage
+    MapDataAddress: .word 2
+    PalleteAdress: .word 2
+    temp:   
 
- jsr GetBackgroundFromArray
- jsr LoadBackgroundPalletes
- jsr SetBackground
+
+ .segment "CODE"
+    jsr GetBackgroundFromArray
+    jsr LoadBackgroundPalletes
+    jsr SetBackground
 
 
 rts
 
-;uses x as index to get the background from the array
+;uses y as index to get the background from the array
 GetBackgroundFromArray:
+  cpy temp
+  beq :+
+  inx 
+  inx 
+  inx 
+  inx 
+  iny 
+  tya 
+  sta temp
+  :
 
+  
 
   lda BACKGROUNDLIST, x
   sta MapDataAddress
@@ -36,18 +48,17 @@ GetBackgroundFromArray:
 
 rts
 
-ldy #$00
 LoadBackgroundPalletes:
-
-
+  ldy #$00
+  :
 
   lda (PalleteAdress), y
   sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
   iny 
   cpy #$10
-  bne LoadBackgroundPalletes
+  bne :-
 
-   lda #$3F
+  lda #$3F
   sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
   sta $2006 ;store least significant value 00 in ppu write address ..00
@@ -65,9 +76,6 @@ Increase:
      adc #$FF
      sta MapDataAddress
 rts
-
-
-
 
 SetBackground:
 

@@ -3,24 +3,30 @@
 
 OptionAmount = 01
 OptionSteps = 18
+
+
+
+.proc TITLESCREEN
+
+
 .zeropage
     .importzp metaSpriteSlot
     .importzp metaSpriteIndex
     .importzp buttons
     .exportzp Mode
+    .importzp RenderStatus
 
     BackgroundLoaded: .res 1
     Loaded: .res 1
     Options: .res 1
     Mode: .res 1
 
-.segment "CODE"
+.code
    .import LOADBACKGROUND
    .import LOAD_META_SPRITE
    .import AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 
 
-.proc TITLESCREEN
     
     ldx Loaded
     cpx #$00
@@ -31,11 +37,10 @@ OptionSteps = 18
    rts 
  
  LOAD:
-    ldx #$00 
+    ldy #$00 
     jsr LOADBACKGROUND
 
-    lda #$01
-    sta Loaded
+    
 
     lda #$03
     sta metaSpriteIndex
@@ -70,7 +75,10 @@ OptionSteps = 18
 
 
     lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-    sta $2001 
+    sta RenderStatus
+
+    lda #$01
+    sta Loaded
  rts 
 
  ControllerAction:
