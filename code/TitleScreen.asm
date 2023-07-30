@@ -41,8 +41,6 @@ OptionSteps = 18
     ldy #$00 
     jsr LOADBACKGROUND
 
-    
-
     lda #$03
     sta metaSpriteIndex
     lda #$00
@@ -141,8 +139,6 @@ OptionSteps = 18
     adc #$18
     sta $0208
 
-
-  
  rts 
 
  PreviousFlyOption:
