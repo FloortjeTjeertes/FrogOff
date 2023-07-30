@@ -107,6 +107,7 @@ OptionSteps = 18
  rts 
 
  NextOption:
+   
     lda Options
     clc 
     cmp #$01
@@ -121,8 +122,8 @@ OptionSteps = 18
     clc 
     cmp #$00
     beq :+
-     dec Options
-     jsr PreviousFlyOption
+      dec Options
+      jsr PreviousFlyPosition
     : 
  rts 
 
@@ -141,7 +142,7 @@ OptionSteps = 18
 
  rts 
 
- PreviousFlyOption:
+ PreviousFlyPosition:
     lda $0200
     sbc #$18
     sta $0200
@@ -156,6 +157,7 @@ OptionSteps = 18
 
 
  rts 
+
 
  
     
