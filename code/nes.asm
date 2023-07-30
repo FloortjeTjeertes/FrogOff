@@ -15,10 +15,15 @@
 
 JOYPAD1 = $4016
 JOYPAD2 = $4017
+CONTROLLER =$2000
+PPUMASK = $2001
+PPUSTATUS = $2002
+OAMADDR = $2003
+OAMDATA = $2004
 PPUSCROLL = $2005
 PPUADDR = $2006
 PPUDATA = $2007
-PPUMASK = $2001
+
 ; .include "loadMetaSprite.asm"
 
 
@@ -27,14 +32,15 @@ PPUMASK = $2001
  .importzp metaSpriteSlot
  .importzp Mode
  .importzp metaSpriteIndex
- .globalzp buttons , RenderStatus
+ .globalzp buttons , RenderStatus ,PPUControlStatus
 
   buttons: .res 1 ; 1 byte for buttons
   counter: .res 1 
-  Xpos: .res 1
-  Ypos: .res 1
+  ; XScroll: .res 1
+  ; YScroll: .res 1
+  PPUControlStatus: .res 1 ;shadow of PPUCTRL
+  RenderStatus: .res 1 ;shadow of PPUMASK
   ram: .res 1
-  RenderStatus: .res 1
 
 
 .segment "STARTUP"
@@ -56,15 +62,15 @@ RESET:
   ldx #$FF
   txs          ; Set up stack
   inx          ; now X = 0
-  stx $2000    ; disable NMI
-  stx $2001    ; disable rendering
+  stx CONTROLLER    ; disable NMI
+  stx PPUMASK    ; disable rendering
   stx $4010    ; disable DMC IRQs
   
   lda #$00    ;store 0 in acumulator to clear counter
   sta counter ;store acumulator in counter (should be 0)
 
   jsr WAITVBLANK
-
+ 
 
 CLRMEM:
   sta $0000, x
@@ -89,16 +95,16 @@ CLRMEM:
   
 
   lda #$3F
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  sta PPUADDR ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
-  sta $2006 ;store least significant value 00 in ppu write address ..00
+  sta PPUADDR ;store least significant value 00 in ppu write address ..00
 
   ldx #$00  
 
   lda #%10001000 ;enable nmi change background to use second char set
-  sta $2000  ;PPUCTRL ppu controll register
+  sta CONTROLLER  ;PPUCTRL ppu controll register
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
+  sta PPUMASK
 
 
 
@@ -114,9 +120,9 @@ CLRMEM:
   ldy #$00
 
 ;set game in mode 0 (title screen)
-  lda #$00
-  sta Mode
-  
+
+lda #$00
+sta Mode
 
 LOOP:
 
@@ -135,7 +141,6 @@ LOOP:
     jsr DEBUG
   :
 
-  jsr CHECKBUTTONS
 
   
 jmp LOOP
@@ -152,56 +157,7 @@ jmp LOOP
 
 .import DEBUG
 
-CHECKBUTTONS:
-  lda DOWN 
-  and buttons
-  cmp DOWN
-  beq MOVEDOWN
 
-  lda UP
-  and buttons
-  cmp UP
-  beq MOVEUP
-
-  lda LEFT 
-  and buttons
-  cmp LEFT
-  beq MOVELEFT
-
-  lda RIGHT 
-  and buttons
-  cmp RIGHT
-  beq MOVERIGHT
-
-  lda AButton
-  and buttons
-  cmp AButton
-  beq ABUTTON
-
-
-  rts
-
-ABUTTON:
-rts
-MOVEDOWN:
-  inc Ypos
-  jmp MOVE
-
-MOVEUP:
-  dec Ypos
-  jmp MOVE
-
-MOVERIGHT:
-  inc Xpos
-  jmp MOVE
-
-MOVELEFT:
-  dec Xpos
-  jmp MOVE
-
-MOVE:
-  jsr WAITVBLANK
-rts
 
 ; test code for meta sprites
 ; FlyAnimate:
@@ -229,20 +185,20 @@ rts
 ; rts
 BACKGROUNDFLICKER:
   lda #$3F
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  sta PPUADDR ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
-  sta $2006 
+  sta PPUADDR 
   ldx ram
   inx
   stx ram
   lda ram
-  sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
+  sta PPUDATA ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from PPUADDR) ppu auto increments memory address in PPUADDR on every wright in PPUDATA
   lda #$26
-  sta $2007
+  sta PPUDATA
   lda #$27
-  sta $2007
+  sta PPUDATA
   lda #$28
-  sta $2007
+  sta PPUDATA
   cpx #$3f
 
 rts
@@ -266,12 +222,13 @@ CLEANPPU:
   nop
 rts
 WAITVBLANK:
-  BIT $2002 ;test if vblank is the same as address  2002 if negative flag is not high 
+  BIT PPUSTATUS ;test if vblank is the same as address  2002 if negative flag is not high 
   BPL WAITVBLANK
 
 rts
-VBLANK: ;nmi or vblank what happens in the vblank
-  LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
+NMI: ;nmi or vblank what happens in the vblank
+
+  lda #$02 ;copy sprite data from 0200 -> ppu memory for display
   sta $4014
 
   lda RenderStatus
@@ -280,6 +237,7 @@ VBLANK: ;nmi or vblank what happens in the vblank
   jsr READCONTROLLER
   ; jsr FlyAnimate
   inc counter
+  
 rti
 SELECTGAMEMODE:
        asl A
@@ -319,7 +277,7 @@ RIGHT:
 
 
 .segment "VECTORS"
-    .word VBLANK
+    .word NMI
     .word RESET
 .segment "CHARS"  
       .incbin "../resource/Tiles/PlatformSprites.chr"

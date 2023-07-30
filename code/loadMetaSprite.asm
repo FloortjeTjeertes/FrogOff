@@ -2,7 +2,8 @@
 ; $01 length of the meta sprite
 ; metaSpriteSlot is the place from where the tile data is stored in the oam
 .export  LOAD_META_SPRITE
-
+OAM_START = $0200
+OAM_END = $02FF
 .zeropage
   .exportzp  metaSpriteIndex := $00
   .exportzp  metaSpriteSlot := $01
@@ -137,19 +138,19 @@
     ; Load the tile data
     ; Store the tile data in the $0200 range
     lda (Meta_Sprite_Start_Adress_last_byte),y         
-    sta $0201,x  
+    sta OAM_START+1,x  
     ; Load the Y position data
     ; Store the Y position in the OAM address register
     lda (MetaSpriteYPositionAdress),y         
-    sta $0200,x                  
+    sta OAM_START,x                  
     ; Load the attribute data
     ; Store the attribute data in the $0200 range
     lda (MetaSpriteAtributeAdress),y         
-    sta $0202,x                 
+    sta OAM_START+2,x                 
     ; Load the X position data
     ; Store the X position in the $0200 range
     lda (MetaSpriteXPositionAdress),y         
-    sta $0203,x                 
+    sta OAM_START+3,x                 
 
     ; Increment X register to load the next tile                          
     inx  

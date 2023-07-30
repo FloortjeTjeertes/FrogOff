@@ -7,9 +7,9 @@ PPUMASK = $2001
 
 
 .proc LOADBACKGROUND
- .zeropage
-    MapDataAddress: .word 2
-    PalleteAdress: .word 2
+.zeropage
+  MapDataAddress: .res 2
+  PalleteAdress: .res 2
     temp:   
 
 

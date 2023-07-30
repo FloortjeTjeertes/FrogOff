@@ -1,0 +1,6 @@
+  
+  
+ .proc NMI 
+
+ rti 
+.endproc

@@ -9,17 +9,18 @@ OptionSteps = 18
 .proc TITLESCREEN
 
 
-.zeropage
+.segment "ZEROPAGE"
     .importzp metaSpriteSlot
     .importzp metaSpriteIndex
     .importzp buttons
     .exportzp Mode
     .importzp RenderStatus
+    Mode:  .res 1
+
 
     BackgroundLoaded: .res 1
     Loaded: .res 1
     Options: .res 1
-    Mode: .res 1
 
 .code
    .import LOADBACKGROUND
@@ -109,20 +110,21 @@ OptionSteps = 18
 
  NextOption:
     lda Options
+    clc 
     cmp #$01
     beq :+
-    inc Options
-    jsr NextFlyPosition
+     inc Options
+     jsr NextFlyPosition
     :
  rts 
 
  PreviousOption:
     lda Options
+    clc 
     cmp #$00
     beq :+
-    dec Options
-    jsr PreviousFlyOption
-
+     dec Options
+     jsr PreviousFlyOption
     : 
  rts 
 
