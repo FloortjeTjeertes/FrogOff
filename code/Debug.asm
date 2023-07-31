@@ -5,7 +5,7 @@
 
 .proc DEBUG
 .zeropage
-    .importzp RenderStatus
+    .importzp PPUMask
     Loaded: .res 1
 
 .code
@@ -19,13 +19,12 @@
 rts
 
 LOAD:
-    lda #$1
+    lda #$01
     jsr LOADBACKGROUND
 
-    lda #$01
-    sta Loaded
+  
     lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-    sta RenderStatus
+    sta PPUMask
 
     lda #$01
     sta Loaded

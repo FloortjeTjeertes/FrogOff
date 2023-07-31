@@ -6,18 +6,18 @@ OptionSteps = 18
 
 
 
+
 .proc TITLESCREEN
 
 
 .segment "ZEROPAGE"
+     
     .importzp metaSpriteSlot
     .importzp metaSpriteIndex
     .importzp buttons
     .exportzp Mode
-    .importzp RenderStatus
+    .importzp PPUMask
     Mode:  .res 1
-
-
     BackgroundLoaded: .res 1
     Loaded: .res 1
     Options: .res 1
@@ -74,10 +74,13 @@ OptionSteps = 18
 
 
     lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-    sta RenderStatus
+    sta PPUMask
 
     lda #$01
     sta Loaded
+
+    lda #$00
+    sta Options
  rts 
 
  ControllerAction:
@@ -124,7 +127,7 @@ OptionSteps = 18
     beq :+
       dec Options
       jsr PreviousFlyPosition
-    : 
+    :
  rts 
 
  NextFlyPosition:

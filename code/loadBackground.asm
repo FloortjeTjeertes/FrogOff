@@ -4,16 +4,17 @@ PPUSCROLL = $2005
 PPUADDR = $2006
 PPUDATA = $2007
 PPUMASK = $2001
-
-
+temp = $00
+; MapDataAddress = $00
+; PalleteAdress = $02
 .proc LOADBACKGROUND
 .zeropage
   MapDataAddress: .res 2
   PalleteAdress: .res 2
-    temp:   
 
 
  .segment "CODE"
+   
     jsr GetBackgroundFromArray
     jsr LoadBackgroundPalletes
     jsr SetBackground
@@ -23,6 +24,8 @@ rts
 
 ;uses y as index to get the background from the array
 GetBackgroundFromArray:
+  lda #$00
+  sta temp
   cpy temp
   beq :+
   inx 
@@ -102,12 +105,11 @@ SetBackground:
 
 
   
-   :
-     lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
+    :lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
      sta PPUDATA              ; store the value in the PPU data register (0x2007)
      iny                      ; increment the Y register
      cpy #$FF                 ; compare Y with the value 4096 (the size of a nametable in bytes)
-   bne :-
+    bne :-
 
    ldy #$00    ; load the value 0 into the Y register
 
@@ -115,46 +117,44 @@ SetBackground:
 
     jsr Increase
 
-   :
-
-
-     lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
+    :lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
      sta PPUDATA         ; store the value in the PPU data register (0x2007)
      iny                 ; increment the Y register
      cpy #$FF 
-   bne :-
+    bne :-
    
-   ldy #$00    ; load the value 0 into the Y register
+    ldy #$00    ; load the value 0 into the Y register
 
-       jsr Increase
+    jsr Increase
 
 
-    :
-     lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
+    :lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
      sta PPUDATA   ; store the value in the PPU data register (0x2007)
      iny         ; increment the Y register
      cpy #$FF 
     bne :-
     
-     lda MapDataAddress+1
-     adc #$00
-     sta MapDataAddress+1
+    
 
-     lda MapDataAddress
-     adc #$FF
-     sta MapDataAddress
-  
+    
+    ldy #$00    ; load the value 0 into the Y register
+    jsr Increase
 
-    :
-     lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
+
+    :lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
      sta PPUDATA   ; store the value in the PPU data register (0x2007)
      iny         ; increment the Y register
      cpy #$FF 
     bne :-
-
-
-
   
+  ldy #$00
+  jsr Increase
+
+   :lda (MapDataAddress),y   ; load the value at the address stored in X and Y into the accumulator
+     sta PPUDATA   ; store the value in the PPU data register (0x2007)
+     iny         ; increment the Y register
+     cpy #$04 
+    bne :-
 
  
 
@@ -166,6 +166,7 @@ SetBackground:
   cli
  
 rts
+
 
 .include "Lists/backgrounds.asm"
 

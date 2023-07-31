@@ -23,26 +23,33 @@ OAMDATA = $2004
 PPUSCROLL = $2005
 PPUADDR = $2006
 PPUDATA = $2007
+Oam = $0200
+Drawingbuf = $0300   
 
+ 
 ; .include "loadMetaSprite.asm"
 
-
+ 
 
 .zeropage
+ 
+ .globalzp buttons , PPUMask ,PPUControlStatus, XScroll, YScroll      
+
+  ;reserving space for local vars should do this in the linker cfg but eh
+  Local: .res 16
  .importzp metaSpriteSlot
  .importzp Mode
  .importzp metaSpriteIndex
- .globalzp buttons , RenderStatus ,PPUControlStatus
-
-  buttons: .res 1 ; 1 byte for buttons
+  buttons: .res 1
   counter: .res 1 
-  ; XScroll: .res 1
-  ; YScroll: .res 1
-  PPUControlStatus: .res 1 ;shadow of PPUCTRL
-  RenderStatus: .res 1 ;shadow of PPUMASK
-  ram: .res 1
-
-
+  XScroll: .res 1
+  YScroll: .res 1
+  PPUControlStatus: .res 1 ;shadow of PPUCTRL (soft $2000)
+  PPUMask:          .res 1 ;shadow of PPUMASK (soft $2001)
+  needdma:          .res 1
+  needdraw:         .res 1     
+  needppureg:       .res 1   
+  sleeping:         .res 1
 .segment "STARTUP"
 
 
@@ -101,10 +108,12 @@ CLRMEM:
 
   ldx #$00  
 
-  lda #%10001000 ;enable nmi change background to use second char set
+  lda #%10001000 ;enable nmi change background to use first char set
   sta CONTROLLER  ;PPUCTRL ppu controll register
+  sta PPUControlStatus ;shadow of PPUCTRL (soft $2000)
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
   sta PPUMASK
+  sta PPUMask ;shadow of PPUMASK (soft $2001)
 
 
 
@@ -141,8 +150,7 @@ LOOP:
     jsr DEBUG
   :
 
-
-  
+  jsr DoFrame
 jmp LOOP
 
 
@@ -183,25 +191,7 @@ jmp LOOP
 ;   @END:
    
 ; rts
-BACKGROUNDFLICKER:
-  lda #$3F
-  sta PPUADDR ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
-  lda #$00
-  sta PPUADDR 
-  ldx ram
-  inx
-  stx ram
-  lda ram
-  sta PPUDATA ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from PPUADDR) ppu auto increments memory address in PPUADDR on every wright in PPUDATA
-  lda #$26
-  sta PPUDATA
-  lda #$27
-  sta PPUDATA
-  lda #$28
-  sta PPUDATA
-  cpx #$3f
 
-rts
 ;shifts 1 every loop until 8 bits are shifted from the nes controller
 ;the status of the controller is stored every loop in the buttons
 READCONTROLLER: 
@@ -226,19 +216,88 @@ WAITVBLANK:
   BPL WAITVBLANK
 
 rts
+
+WaitFrame:
+  inc sleeping
+    @loop:
+      lda sleeping
+      bne @loop
+rts
+
+DoFrame:
+     lda #1
+     sta needdraw
+     sta needdma
+     sta needppureg
+     jsr WaitFrame
+     jsr READCONTROLLER
+     inc counter
+rts
+
+; DoDrawing:
+
+;   lda #$0300,x
+;   sta PPUDATA,x
+;   jmp DoDrawing
+
+; rts
+
 NMI: ;nmi or vblank what happens in the vblank
 
-  lda #$02 ;copy sprite data from 0200 -> ppu memory for display
-  sta $4014
 
-  lda RenderStatus
-  sta PPUMASK ;enable/disable rendering
+     pha         
+     txa
+     pha
+     tya
+     pha
 
-  jsr READCONTROLLER
-  ; jsr FlyAnimate
-  inc counter
-  
+     lda needdma
+     beq :+
+       lda #0      ; do sprite DMA
+       sta $2003   ; conditional via the 'needdma' flag
+       lda #>Oam
+       sta $4014
+
+  :  lda needdraw       ; do other PPU drawing (NT/Palette/whathaveyou)
+     beq :+             ;  conditional via the 'needdraw' flag
+       bit $2002        ; clear VBl flag, reset $2005/$2006 toggle
+       ;jsr DoDrawing    ; draw the stuff from the drawing buffer
+       dec needdraw
+
+  :  lda needppureg
+     beq :+
+       lda PPUMask   ; copy buffered $2000/$2001 (conditional via needppureg)
+       sta $2001
+       lda PPUControlStatus
+       sta $2000
+
+
+       bit $2002
+       lda XScroll    ; set X/Y scroll (conditional via needppureg)
+       sta $2005
+       lda YScroll
+       sta $2005
+
+
+
+   :
+   ;music engine can go here
+
+   
+   lda #0         ; clear the sleeping flag so that WaitFrame will exit
+   sta sleeping
+
+     pla            ; restore regs and exit
+     tay
+     pla
+     tax
+     pla
+     rti
 rti
+
+
+
+
 SELECTGAMEMODE:
        asl A
        tax
@@ -247,9 +306,6 @@ SELECTGAMEMODE:
        lda GAMEMODES,x
        pha
 rts
-
-
-
 GAMEMODES:
   .word TITLESCREEN-1 , SINGLEPLAYER-1, DEBUG-1
 
