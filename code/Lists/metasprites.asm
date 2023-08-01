@@ -7,8 +7,8 @@ META_LOOKUP_TABLE:
   .addr META_ATRIBUTE_DATA   
   .addr META_POSITION_DATA_X   
   .addr META_POSITION_DATA_Y   
-  .byte 04               ; player 1 sprite length/
-  .addr META_TILE_DATA+4 ; player 1 facing right
+  .byte 04               ; player 1 jump sprite length
+  .addr META_TILE_DATA+4 ; player 1 jump facing right
   .addr META_ATRIBUTE_DATA+4   
   .addr META_POSITION_DATA_X+4   
   .addr META_POSITION_DATA_Y+4 

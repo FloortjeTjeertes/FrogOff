@@ -9,6 +9,9 @@ OptionSteps = 18
 
 .proc TITLESCREEN
 
+.segment "LOCAL"
+    Loaded: .res 1
+    Options: .res 1
 
 .segment "ZEROPAGE"
      
@@ -18,9 +21,6 @@ OptionSteps = 18
     .exportzp Mode
     .importzp PPUMask
     Mode:  .res 1
-    BackgroundLoaded: .res 1
-    Loaded: .res 1
-    Options: .res 1
 
 .code
    .import LOADBACKGROUND

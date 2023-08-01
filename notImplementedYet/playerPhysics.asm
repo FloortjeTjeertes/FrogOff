@@ -1,0 +1,3 @@
+.proc PLAYERPHYSICS
+rts
+.endproc
