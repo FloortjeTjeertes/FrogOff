@@ -13,7 +13,7 @@ temp = $00
   PalleteAdress: .res 2
 
 
- .segment "CODE"
+.segment "CODE"
    
     jsr GetBackgroundFromArray
     jsr LoadBackgroundPalletes
@@ -168,7 +168,7 @@ SetBackground:
 rts
 
 
-.include "Lists/backgrounds.asm"
+.include "../Lists/backgrounds.asm"
 
 
 .endproc

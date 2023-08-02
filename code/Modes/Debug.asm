@@ -8,13 +8,16 @@
     .importzp PPUMask
     Loaded: .res 1
 
-.code
+.segment "CODE"
  
 
 
   ldx Loaded
     cpx #$00
     beq LOAD
+
+   jsr LOADENTITIE
+
 
 rts
 
@@ -31,5 +34,5 @@ LOAD:
 rts
 
 .import LOADBACKGROUND
-
+.import LOADENTITIE
 .endproc

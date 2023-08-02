@@ -2,6 +2,7 @@
 ; $01 length of the meta sprite
 ; metaSpriteSlot is the place from where the tile data is stored in the oam
 .export  LOAD_META_SPRITE
+
 OAM_START = $0200
 OAM_END = $02FF
 .zeropage
@@ -18,7 +19,6 @@ OAM_END = $02FF
   metaSpriteLength: .res 1
   metaOffset: .res 1
   temp: .res 1
-
 .segment "CODE"
 .proc LOAD_META_SPRITE
 
@@ -170,6 +170,6 @@ OAM_END = $02FF
   rts
 
 
-  .include "Lists/metasprites.asm"
+  .include "../Lists/metasprites.asm"
 
 .endproc

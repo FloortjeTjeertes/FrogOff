@@ -13,7 +13,7 @@ del %objfile%
 del %outnes%
 
 REM Compile each assembly file in the "bin" folder
-for %%f in (code\*.asm) do (
+for /r "code" %%f in (*.asm) do (
     echo Compiling "%%~nf.asm"
     
     "tools/ca65.exe" "%%~f" -o "bin\%%~nf.o" -t nes --debug-info
@@ -38,7 +38,7 @@ echo Linking "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outp
 @REM make linking dynamic
 
 @REM "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
-"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o bin/SinglePlayer.o bin/Debug.o -o    bin/%outputname%.nes -t nes --dbgfile bin\%outputname%.dbg
+"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o bin/SinglePlayer.o bin/Debug.o  bin/LoadEntitie.o bin/playerPhysics.o -o    bin/%outputname%.nes -t nes --dbgfile bin\%outputname%.dbg
 if errorlevel 1 (
     echo Linking failed.
     REM Remove the temporary file
