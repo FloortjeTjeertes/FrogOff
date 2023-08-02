@@ -12,6 +12,7 @@ REM Delete previous output files
 del %objfile%
 del %outnes%
 
+
 REM Compile each assembly file in the "bin" folder
 for /r "code" %%f in (*.asm) do (
     echo Compiling "%%~nf.asm"
@@ -51,4 +52,4 @@ echo Running %outnes%
 start "" "tools\Mesen.exe" %outnes% --debugger --trace
 
 REM Cleanup: Delete the object file
-del %objfile%
+del /q "bin\*.o"
