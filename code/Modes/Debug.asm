@@ -17,7 +17,7 @@
     beq LOAD
 
    jsr LOADENTITIE
-
+   jsr RENDER
 
 rts
 
@@ -35,4 +35,5 @@ rts
 
 .import LOADBACKGROUND
 .import LOADENTITIE
+.import RENDER
 .endproc

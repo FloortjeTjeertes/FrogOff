@@ -3,7 +3,7 @@
 
 @echo off
 
-set outputname=nes
+set outputname=FrogOff
 set objfile=bin\%outputname%.o
 set outnes=bin\%outputname%.nes
 set OfileList=
@@ -39,7 +39,7 @@ echo Linking "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outp
 @REM make linking dynamic
 
 @REM "tools/ld65.exe" %OfileList% -o %outnes% -t nes --dbgfile bin\%outputname%.dbg
-"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o bin/SinglePlayer.o bin/Debug.o  bin/LoadEntitie.o bin/playerPhysics.o -o    bin/%outputname%.nes -t nes --dbgfile bin\%outputname%.dbg
+"tools/ld65.exe" bin/nes.o bin/loadMetaSprite.o bin/loadBackground.o bin/TitleScreen.o bin/SinglePlayer.o bin/Debug.o  bin/LoadEntitie.o bin/playerPhysics.o bin/RenderEntities.o -o bin/%outputname%.nes -t nes --dbgfile bin\%outputname%.dbg
 if errorlevel 1 (
     echo Linking failed.
     REM Remove the temporary file

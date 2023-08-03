@@ -23,8 +23,12 @@ EntitieArray = $03FF
      iny 
      lda EntitieArray,y
      and #%00000000
+     cmp #$01
      beq RENDERINBACKGEOUND
+
+     lda EntitieArray,y
      and #%00000001
+     cmp #$01
      beq RENDERINFORGROUND
 
      
@@ -40,6 +44,8 @@ rts
 
 RENDERINFORGROUND:
     lda EntitieArray+1,y
+    sta metaSpriteIndex
+    inc metaSpriteSlot
     jsr LOAD_META_SPRITE
 rts
 
