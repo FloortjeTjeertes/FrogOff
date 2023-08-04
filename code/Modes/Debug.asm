@@ -16,7 +16,6 @@
     cpx #$00
     beq LOAD
 
-   jsr LOADENTITIE
    jsr RENDER
 
 rts
@@ -31,6 +30,12 @@ LOAD:
 
     lda #$01
     sta Loaded
+    
+    ldx #$00
+    jsr LOADENTITIE
+    ldx #$00
+    jsr LOADENTITIE
+
 rts
 
 .import LOADBACKGROUND

@@ -12,7 +12,7 @@
 
 
 
-EntitieArray = $03FF
+EntitieArray = $03FA
 MaxLength = 10
 
 .export LOADENTITIE
@@ -24,22 +24,26 @@ MaxLength = 10
   EmptySpace: .res 1
 
 .segment "CODE"
- ldx #$00
+ ldy #$00
 
- ldy EntitieArrayLength
-
+ lda EntitieArrayLength
  ;if index is first place in array skip empty space check
  cmp #$00 
  beq @LOAD
 
  ;if the index is not the same as the empty space do not use the empty space index as the index
+ jsr @increaser
  cmp EmptySpace
  bne @LOAD
  ldy EmptySpace
 
 @LOAD:
     iny 
-
+    iny 
+    iny 
+    iny 
+    iny 
+    iny 
     ;load options into the array
     lda Entities,x
     sta EntitieArray,y
@@ -55,7 +59,29 @@ MaxLength = 10
     ;load the AI address high byte
     lda Entities+3,x
     sta EntitieArray+3,y
+
+    ;set the position of the entity to 0
+    lda #$00
+    sta EntitieArray+4,y
+    sta EntitieArray+5,y
+
+    inc EntitieArrayLength
 rts 
+
+@increaser:
+  :
+    cpx EntitieArrayLength
+    bne @skip
+     iny 
+     iny 
+     iny 
+     iny 
+     iny 
+     iny 
+     inx    
+    bne  :-
+  @skip:
+rts
 
 
 .include "../Lists/Entities.asm"

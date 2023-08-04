@@ -292,7 +292,7 @@ NMI: ;nmi or vblank what happens in the vblank
      pla
      tax
      pla
-     rti
+     
 rti
 
 

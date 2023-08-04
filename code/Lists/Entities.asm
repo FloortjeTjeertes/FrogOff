@@ -19,7 +19,7 @@
 
 Entities:
 .byte 00000001 ;status byte
-.byte 01       ; 
+.byte 00       ; 
 .addr PLAYERPHYSICS
 
 
