@@ -14,7 +14,12 @@
 
   ldx Loaded
     cpx #$00
-    beq LOAD
+    beq @Load
+    bne @Continue
+    @Load:
+     jsr LOAD
+
+    @Continue:
 
    jsr RENDER
 
@@ -33,6 +38,7 @@ LOAD:
     
     ldx #$00
     jsr LOADENTITIE
+
     ldx #$00
     jsr LOADENTITIE
 

@@ -166,7 +166,9 @@ OAM_END = $02FF
 
   ; If not, continue loading tiles    
   bne LOAD_TILE                
-
+   
+   ldy #$00
+   ldx #$00
   rts
 
 

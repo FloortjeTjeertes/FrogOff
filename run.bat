@@ -1,1 +1,1 @@
-"tools\mesen.exe" ./bin/nes.nes --debugger --trace
+"tools\mesen.exe" ./bin/FrogOff.nes --debugger --trace

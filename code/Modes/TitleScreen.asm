@@ -31,11 +31,17 @@ OptionSteps = 18
     
     ldx Loaded
     cpx #$00
-    beq LOAD
+    beq @Load
+    bne @Continue
+    @Load:
+     jsr LOAD 
+
+    @Continue:
+
     
     jsr ControllerAction
-
-   rts 
+    
+rts 
  
  LOAD:
     ldy #$00 

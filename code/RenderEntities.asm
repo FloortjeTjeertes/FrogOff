@@ -8,7 +8,7 @@ EntitieArray = $03FF
 
 .proc RENDER
 .segment "LOCAL"
-
+  @Length = $02
 .zeropage
  .importzp EntitieArrayLength 
  .importzp metaSpriteIndex , metaSpriteSlot
@@ -22,42 +22,57 @@ EntitieArray = $03FF
     lda #$FF
     sta metaSpriteSlot
 
-    lda #$00
-    pha 
+  
     @loop:
-     pla    
-     cmp EntitieArrayLength
+     ldy @Length 
+     cpy EntitieArrayLength
      beq @endloop
 
      iny 
+     sty @Length 
+
 
      lda EntitieArray,y
      and #%00000000
      cmp #$01
-     beq RENDERINBACKGEOUND
+     beq @background
+
 
      lda EntitieArray,y
      and #%00000001
      cmp #$01
-     beq RENDERINFORGROUND
+     beq @foreground
+
+
+     @background:
+        jsr RENDERINBACKGEOUND
+        jmp @Continue
+
+     @foreground:
+        jsr RENDERINFORGROUND
+     
+     @Continue: 
+
      
      ;store the loop count on the stack
-     tya 
-     pha  
-     jmp @loop
+      
+    jmp @loop
+
     @endloop:
 ;  pla 
 rts
 
-RENDERINBACKGEOUND:
-    lda EntitieArray+1,y
-rts
 
-RENDERINFORGROUND:
-    lda EntitieArray+1,y
-    sta metaSpriteIndex
-    inc metaSpriteSlot
-    jsr LOAD_META_SPRITE
-rts
+    RENDERINBACKGEOUND:
+        lda EntitieArray+1,y
+    rts 
+
+    RENDERINFORGROUND:
+        lda EntitieArray+1,y
+        sta metaSpriteIndex
+        inc metaSpriteSlot
+        jsr LOAD_META_SPRITE
+    rts 
+
 
 .endproc

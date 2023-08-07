@@ -22,6 +22,7 @@ MaxLength = 10
   .exportzp EntitieArrayLength , EmptySpace
   EntitieArrayLength: .res 1
   EmptySpace: .res 1
+  Length: .res 1
 
 .segment "CODE"
  ldy #$00
@@ -32,12 +33,15 @@ MaxLength = 10
  beq @LOAD
 
  ;if the index is not the same as the empty space do not use the empty space index as the index
- jsr @increaser
  cmp EmptySpace
  bne @LOAD
  ldy EmptySpace
 
 @LOAD:
+    lda Length
+    tay 
+
+
     iny 
     iny 
     iny 
@@ -66,6 +70,10 @@ MaxLength = 10
     sta EntitieArray+5,y
 
     inc EntitieArrayLength
+
+    
+    tya 
+    sta Length
 rts 
 
 @increaser:
