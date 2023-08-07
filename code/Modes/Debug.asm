@@ -22,7 +22,7 @@
     @Continue:
 
    jsr RENDER
-
+   jsr RUNENTITIEBEHAVIOUR
 rts
 
 LOAD:
@@ -47,4 +47,5 @@ rts
 .import LOADBACKGROUND
 .import LOADENTITIE
 .import RENDER
+.import RUNENTITIEBEHAVIOUR
 .endproc

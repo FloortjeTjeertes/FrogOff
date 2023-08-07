@@ -1,0 +1,6 @@
+.export LOADBACKGROUNDSPRITE
+
+.proc LOADBACKGROUNDSPRITE
+
+rts
+.endproc

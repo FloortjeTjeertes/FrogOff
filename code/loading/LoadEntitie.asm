@@ -3,6 +3,8 @@
 ; the entities loaded from a list of entities in the format .
 ; #$ForeGroundBackground,#$tileEntry, #$AIAddressLow , #$AIAddressHigh 
 ;
+; stores in format 
+; #$ForeGroundBackground,#$tileEntry, #$AIAddressLow , #$AIAddressHigh , #$XPositionLow , #$XPositionHigh , #$YPositionLow , #$YPositionHigh
 ;               +===========+
 ;               |  EXPORTS  |                         
 ;               +===========+
@@ -11,8 +13,8 @@
 ;
 
 
-
-EntitieArray = $03FA
+;start address of entitie array
+EntitieArray = $03F8 
 MaxLength = 10
 
 .export LOADENTITIE
@@ -48,6 +50,8 @@ MaxLength = 10
     iny 
     iny 
     iny 
+    iny 
+    iny 
     ;load options into the array
     lda Entities,x
     sta EntitieArray,y
@@ -64,10 +68,15 @@ MaxLength = 10
     lda Entities+3,x
     sta EntitieArray+3,y
 
-    ;set the position of the entity to 0
+    ;set the position of the entity to 0 (16 bites per coordinate)
+    ;X position
     lda #$00
     sta EntitieArray+4,y
     sta EntitieArray+5,y
+    
+    ;Y position
+    sta EntitieArray+6,y
+    sta EntitieArray+7,y
 
     inc EntitieArrayLength
 
