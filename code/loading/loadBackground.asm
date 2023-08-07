@@ -24,7 +24,6 @@ rts
 
 ;uses y as index to get the background from the array
 GetBackgroundFromArray:
-  lda #$00
   sta temp
   cpy temp
   beq :+
