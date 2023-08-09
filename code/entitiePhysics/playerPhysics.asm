@@ -46,4 +46,19 @@ Falling:
 
 rts
 
+;check collision with the ground
+;still a test
+CheckCollision:
+  lda ypos
+  cmp #$A4
+  bne @noColision
+  lda ypos+1
+  cmp #$CE
+  bne @noColision
+  
+  
+
+  @noColision:
+rts
+
 .endproc
