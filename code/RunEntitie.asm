@@ -1,38 +1,66 @@
+; arguments
+; 
+; runs entitie behaviour
+;
+; inports: EntitieArrayLength
+; exports: xpos, ypos
+;
+; Local vars: Length, Adress, ModifyingCode
+;
+; uses: EntitieArray
+
+
 .export RUNENTITIEBEHAVIOUR
 
-EntitieArray = $03FF
+EntitieArray = $0400
 Length = $02
 Adress = $03
+ModifyingCode = $05  
 
 
 
 .proc RUNENTITIEBEHAVIOUR
 
 .segment "LOCAL"
+ 
+  
 .zeropage 
  .importzp EntitieArrayLength 
  .exportzp xpos, ypos
 
-  xpos: .byte 2
-  ypos: .byte 2
+  xpos: .res 2
+  ypos: .res 2
+  
+
 
 .segment "CODE"
+    ldy #$00
+    ldx #$00
+    lda #$00
+    sta Length
  
     @loop:
-     ldy Length 
-     cpy EntitieArrayLength
+     ldx Length 
+     cpx EntitieArrayLength
      beq @endloop
-
-     iny 
-     sty Length 
       
       jsr SELECTENTITY
 
       jsr RUNBEHAVIOUR
 
+     iny 
+    ;  iny 
+    ;  iny 
+    ;  iny 
+    ;  iny 
+    ;  iny 
+    ;  iny 
+    ;  iny 
 
-     
-     ;store the loop count on the stack
+     tya 
+     tax 
+     stx Length 
+
       
     jmp @loop
     @endloop:
@@ -62,14 +90,29 @@ SELECTENTITY:
 rts
 
 RUNBEHAVIOUR:
- lda @Return
- pha 
- lda @Return+1
- pha 
+ lda #$20
+ sta ModifyingCode
+ lda Adress
+ sta ModifyingCode+1
+ lda Adress+1
+ sta ModifyingCode+2
 
+ lda #$60
+ sta ModifyingCode+3
+ 
+ jsr ModifyingCode
 
- jmp (Adress)
- @Return:
+ ;load posibly updated values back into array
+ lda xpos
+ sta EntitieArray+4 ,y
+ lda xpos+1
+ sta EntitieArray+5 ,y
+
+ lda ypos
+ sta EntitieArray+6 ,y
+ lda ypos+1
+ sta EntitieArray+7 ,y
+
 rts
 
 .endproc

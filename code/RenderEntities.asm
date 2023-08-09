@@ -18,9 +18,11 @@ EntitieArray = $03FF
     ldy #$00
     ldx #$00
     lda #$00
+    sta @Length
     sta metaSpriteIndex
     lda #$FF
     sta metaSpriteSlot
+
 
   
     @loop:

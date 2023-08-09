@@ -55,11 +55,7 @@ Drawingbuf = $0300
 
 jsr WAITVBLANK
 
-
 jsr CLEANPPU
-
-
-
 
 RESET:
   sei          ; disable IRQs
@@ -123,7 +119,6 @@ CLRMEM:
 
 ;program loop
 
-  
 ; clear c and y
   ldx #$00
   ldy #$00
@@ -167,30 +162,6 @@ jmp LOOP
 
 
 
-; test code for meta sprites
-; FlyAnimate:
-;   lda counter 
-;   and #$07
-;   cmp #$00
-;   beq :+
-
-;   lda #$03 
-;   sta metaSpriteIndex
-;   lda #$02
-;   sta metaSpriteSlot
-;   jsr LOAD_META_SPRITE   ; Initialize meta sprites
-;   jmp @END
-;   :
-
-;     lda #$04 
-;     sta metaSpriteIndex
-;     lda #$02
-;     sta metaSpriteSlot
-;   jsr LOAD_META_SPRITE   ; Initialize meta sprites
-  
-;   @END:
-   
-; rts
 
 ;shifts 1 every loop until 8 bits are shifted from the nes controller
 ;the status of the controller is stored every loop in the buttons

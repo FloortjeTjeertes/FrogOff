@@ -8,7 +8,7 @@ OAM_END = $02FF
 .zeropage
   .exportzp  metaSpriteIndex := $00
   .exportzp  metaSpriteSlot := $01
-
+  .importzp  xpos, ypos
   ; local variables
   Meta_Sprite_Start_Adress_last_byte: .res 1
   Meta_Sprite_Start_Adress_first_byte: .res 1
@@ -141,7 +141,8 @@ OAM_END = $02FF
     sta OAM_START+1,x  
     ; Load the Y position data
     ; Store the Y position in the OAM address register
-    lda (MetaSpriteYPositionAdress),y         
+    lda (MetaSpriteYPositionAdress),y   
+    adc ypos
     sta OAM_START,x                  
     ; Load the attribute data
     ; Store the attribute data in the $0200 range
@@ -149,7 +150,8 @@ OAM_END = $02FF
     sta OAM_START+2,x                 
     ; Load the X position data
     ; Store the X position in the $0200 range
-    lda (MetaSpriteXPositionAdress),y         
+    lda (MetaSpriteXPositionAdress),y      
+    adc xpos
     sta OAM_START+3,x                 
 
     ; Increment X register to load the next tile                          
