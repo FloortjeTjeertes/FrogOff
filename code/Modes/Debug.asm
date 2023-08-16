@@ -35,11 +35,13 @@ LOAD:
     lda #$01
     sta Loaded
     
-    ldx #$00
+    lda #$00
+    sta $00 ;index
     jsr LOADENTITIE
 
 
-    ldx #$00
+    lda #$01
+    sta $00
     jsr LOADENTITIE
 
 

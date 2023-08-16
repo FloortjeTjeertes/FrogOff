@@ -16,6 +16,7 @@
 ;start address of entitie array
 EntitieArray = $03F8 
 MaxLength = 10
+Index = $00
 
 .export LOADENTITIE
 
@@ -29,11 +30,13 @@ MaxLength = 10
 .segment "CODE"
  ldy #$00
 
+
  lda EntitieArrayLength
  ;if index is first place in array skip empty space check
  cmp #$00 
  beq @LOAD
-
+ 
+ jsr @increaser
  ;if the index is not the same as the empty space do not use the empty space index as the index
  cmp EmptySpace
  bne @LOAD
@@ -89,6 +92,8 @@ rts
   :
     cpx EntitieArrayLength
     bne @skip
+     iny 
+     iny 
      iny 
      iny 
      iny 
