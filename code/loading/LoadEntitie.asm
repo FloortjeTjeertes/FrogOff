@@ -36,7 +36,8 @@ Index = $00
  cmp #$00 
  beq @LOAD
  
- jsr @increaser
+;  jsr @increaser
+
  ;if the index is not the same as the empty space do not use the empty space index as the index
  cmp EmptySpace
  bne @LOAD
