@@ -20,7 +20,6 @@
      jsr LOAD
 
   @Continue:
-
   jsr RENDER
   jsr RUNENTITIEBEHAVIOUR
 rts
@@ -39,8 +38,11 @@ LOAD:
     ldx #$00
     jsr LOADENTITIE
 
-    ; ldx #$00
-    ; jsr LOADENTITIE
+
+    ldx #$00
+    jsr LOADENTITIE
+
+
 
 rts
 

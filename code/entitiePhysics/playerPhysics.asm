@@ -27,7 +27,7 @@ rts
 
 ;maybe move this to a generic file
 ;subpixel value 
-@Grafity = 10
+@Grafity = 30
 Falling:
  lda ypos
  sta ValueToIncrease
@@ -35,7 +35,7 @@ Falling:
  sta ValueToIncrease+1
 
 
- lda #$AA
+ lda #$FF
  sta StepValue
  jsr INCREASE
 

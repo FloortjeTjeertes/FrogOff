@@ -49,16 +49,16 @@ ModifyingCode = $05
       jsr RUNBEHAVIOUR
 
      iny 
-    ;  iny 
-    ;  iny 
-    ;  iny 
-    ;  iny 
-    ;  iny 
-    ;  iny 
-    ;  iny 
+     iny 
+     iny 
+     iny 
+     iny 
+     iny 
+     iny 
+     iny 
 
      tya 
-     tax 
+     inx 
      stx Length 
 
       
