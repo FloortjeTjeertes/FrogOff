@@ -17,9 +17,10 @@ OptionSteps = 18
      
     .importzp metaSpriteSlot
     .importzp metaSpriteIndex
-    .importzp buttons
     .exportzp Mode
     .importzp PPUMask
+    ;imports from ButtonReading.asm
+    .importzp PRESSEDBUTTONS1, RELEASEDBUTTONS1
     Mode:  .res 1
 
 .code
@@ -91,19 +92,19 @@ rts
 
  ControllerAction:
     lda DOWN
-    and buttons
+    and PRESSEDBUTTONS1
     cmp DOWN
     beq NextOption
 
     lda UP
-    and buttons
+    and PRESSEDBUTTONS1
     cmp UP
     beq PreviousOption
 
     
 
     lda START
-    and buttons
+    and PRESSEDBUTTONS1
     cmp START
     beq StartOption
 
@@ -168,7 +169,6 @@ rts
  rts 
 
 
- 
     
 
 .endproc

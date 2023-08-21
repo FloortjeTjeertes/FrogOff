@@ -40,7 +40,8 @@ Drawingbuf = $0300
  .importzp metaSpriteSlot
  .importzp Mode
  .importzp metaSpriteIndex
-  buttons: .res 1
+ ;buttons imported from ButtonReading.asm
+ .importzp PRESSEDBUTTONS1 ,RELEASEDBUTTONS1
   counter: .res 1 
   XScroll: .res 1
   YScroll: .res 1
@@ -160,23 +161,12 @@ jmp LOOP
 
 .import DEBUG
 
+.import READCONTROLLER
 
 
 
-;shifts 1 every loop until 8 bits are shifted from the nes controller
-;the status of the controller is stored every loop in the buttons
-READCONTROLLER: 
-    lda #$01 
-    sta JOYPAD1 ;write 1 to joypad 1
-    sta buttons ;write 1 to buttons
-    lsr a   ; shifts 1 out of acumulator to make acumulator 0
-    sta JOYPAD1 ;write aculumator (0) to joypad 1 (clears strobe bit and controller will keep stored value (pressed buttons) static
-    :                                                                    
-      lda JOYPAD1 ;read joypad 1 into acumulator                           
-      lsr a ;shift left shifts red byte to form a full 8 bits of the read controller                                                
-      rol buttons ;shift left to eventually put 1 in carry (looping trough all bits in the buttons variable)      
-    bcc :- ;branch to last ":" if carry flag is not set
-rts
+
+
 CLEANPPU:
   lda #$02 ;select most significant bite
   sta $4014 ;OAMDMA address
