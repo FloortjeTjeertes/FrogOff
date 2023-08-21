@@ -33,7 +33,7 @@ Drawingbuf = $0300
 
 .zeropage
  
- .globalzp buttons , PPUMask ,PPUControlStatus, XScroll, YScroll      
+ .globalzp buttons , PPUMask ,PPUControlStatus, XScroll, YScroll , counter    
 
   ;reserving space for local vars should do this in the linker cfg but eh
   Local: .res 16
