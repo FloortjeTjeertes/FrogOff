@@ -13,6 +13,7 @@
 .proc PLAYERPHYSICS
 .zeropage 
 .importzp xpos , ypos
+ speed: .byte 1 
 
 
 .segment "CODE"
@@ -27,15 +28,13 @@ rts
 
 ;maybe move this to a generic file
 ;subpixel value 
-@Grafity = 30
 Falling:
  lda ypos
  sta ValueToIncrease
  lda ypos+1
  sta ValueToIncrease+1
-
-
- lda #$FF
+ stx speed
+ lda FallingValues,x 
  sta StepValue
  jsr INCREASE
 
@@ -43,8 +42,12 @@ Falling:
  sta ypos
  lda ValueToIncrease+1
  sta ypos+1
+ 
 
+ inc speed
 rts
+
+FallingValues:  .byte 50 , 100 , 200 , 255 
 
 ;check collision with the ground
 ;still a test

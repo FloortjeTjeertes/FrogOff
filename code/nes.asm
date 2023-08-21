@@ -165,8 +165,6 @@ jmp LOOP
 
 
 
- 
-
 CLEANPPU:
   lda #$02 ;select most significant bite
   sta $4014 ;OAMDMA address
