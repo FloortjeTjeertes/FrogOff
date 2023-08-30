@@ -1,9 +1,9 @@
 ; Substracts two 16-bit numbers
     num1 = $00 
 	num2 = $02
-	result = $04
+	result := $04
 .export SUBTRACT
-.export num1, num2, result
+
     
 .proc SUBTRACT
     sec				    ; set carry for borrow purpose
