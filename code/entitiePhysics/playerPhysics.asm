@@ -8,8 +8,11 @@
 
 .export PLAYERPHYSICS
 
-.import INCREASE
+.import INCREASE , DECREASE
+.import counter
+.import AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 .importzp ValueToIncrease, StepValue
+.importzp PRESSEDBUTTONS1
 
 .proc PLAYERPHYSICS
 
@@ -17,28 +20,70 @@
 
 .zeropage 
 .importzp xpos , ypos
- speed: .byte 1 
- cycle: .byte 1
+ duration: .byte 1
+ loop:    .byte 1  
 
 .segment "CODE"
-
- jsr Falling
  
+ jsr @ControllerAction
+
+
+
+ lda ypos
+ cmp #$7f
+ beq :+
+ jsr Falling
+ :
  ldx #$00
  ldy #$00
 rts
 
+@ControllerAction:
+  ;  lda AButton
+  ;  and PRESSEDBUTTONS1
+  ;  cmp AButton
+
+   lda LEFT
+   and PRESSEDBUTTONS1
+   cmp LEFT
+   beq @left
+
+   lda RIGHT
+   and PRESSEDBUTTONS1
+   cmp RIGHT
+   beq @right
+
+   jmp @endActions
+
+   @left:
+      jsr PlayerLeftAction
+   jmp @endActions
+
+   @right:
+     jsr PlayerRightAction
+   jmp @endActions
+
+   @endActions:
+   
+
+
+rts
 
 
  
 ;maybe move this to a generic file
 ;subpixel value 
 Falling:
+ @length = 3
+   
+
  lda ypos
  sta ValueToIncrease
  lda ypos+1
  sta ValueToIncrease+1
- stx speed
+
+ 
+ ldx loop
  lda FallingValues,x 
  sta StepValue
  jsr INCREASE
@@ -48,19 +93,28 @@ Falling:
  lda ValueToIncrease+1
  sta ypos+1
  
- lda cycle
- cmp #$FF
+
+ lda duration
+ cmp Durations,x
  bne :+
 
- cpx #$03
- bne :+
- inc speed
-  :
- inc cycle
+  lda loop
+  cmp #$03
+  beq :+
+  inc loop
+
+  lda #$00
+  sta duration
+ :
+
+
+ 
+ inc duration
+ 
 rts
 
-FallingValues:  .byte 50 , 100 , 200 , 255 
-
+FallingValues:  .byte 80 , 100 , 200 , 255 
+Durations:      .byte 20 , 10 , 5 , 2
 ;check collision with the ground
 ;still a test
 CheckCollision:
@@ -75,5 +129,42 @@ CheckCollision:
 
   @noColision:
 rts
+
+PlayerLeftAction:
+
+ lda xpos
+ sta ValueToIncrease
+ lda xpos+1
+ sta ValueToIncrease+1
+
+ 
+ lda #$F0
+ sta StepValue
+ jsr DECREASE
+
+ lda ValueToIncrease
+ sta xpos
+ lda ValueToIncrease+1
+ sta xpos+1
+
+rts
+
+PlayerRightAction:
+ lda xpos
+ sta ValueToIncrease
+ lda xpos+1
+ sta ValueToIncrease+1
+
+ 
+ lda #$F0
+ sta StepValue
+ jsr INCREASE
+
+ lda ValueToIncrease
+ sta xpos
+ lda ValueToIncrease+1
+ sta xpos+1
+rts
+
 
 .endproc

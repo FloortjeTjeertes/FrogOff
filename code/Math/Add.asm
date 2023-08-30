@@ -3,9 +3,8 @@
 
     num1 = $00
 	num2 = $02
-	result = $04
+	result := $04
 .export Add
-.export num1, num2, result
 .proc Add
  
     clc				; clear carry

@@ -116,8 +116,6 @@ CLRMEM:
 
 .segment "CODE"
 
-
-
 ;program loop
 
 ; clear c and y
