@@ -9,7 +9,6 @@
 .export PLAYERPHYSICS
 
 .import INCREASE
-.import counter
 .importzp ValueToIncrease, StepValue
 
 .proc PLAYERPHYSICS
@@ -19,7 +18,7 @@
 .zeropage 
 .importzp xpos , ypos
  speed: .byte 1 
-
+ cycle: .byte 1
 
 .segment "CODE"
 
@@ -49,14 +48,15 @@ Falling:
  lda ValueToIncrease+1
  sta ypos+1
  
- lda counter
+ lda cycle
  cmp #$FF
- beq :+
+ bne :+
 
  cpx #$03
- beq :+
+ bne :+
  inc speed
   :
+ inc cycle
 rts
 
 FallingValues:  .byte 50 , 100 , 200 , 255 
