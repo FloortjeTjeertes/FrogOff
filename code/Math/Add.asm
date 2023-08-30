@@ -4,8 +4,8 @@
     num1 = $00
 	num2 = $02
 	result := $04
-.export Add
-.proc Add
+.export ADD
+.proc ADD
  
     clc				; clear carry
 	lda num1+1

@@ -15,7 +15,6 @@
 EntitieArray = $0400
 Length = $02
 Adress = $03
-ModifyingCode = $05  
 
 
 
@@ -30,7 +29,7 @@ ModifyingCode = $05
 
   xpos: .res 2
   ypos: .res 2
-  
+  ModifyingCode: .res 4
 
 
 .segment "CODE"

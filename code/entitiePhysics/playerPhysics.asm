@@ -8,7 +8,7 @@
 
 .export PLAYERPHYSICS
 
-.import INCREASE , DECREASE
+.import INCREASE , DECREASE , ADD
 .import counter
 .import AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 .importzp ValueToIncrease, StepValue
@@ -21,27 +21,42 @@
 .zeropage 
 .importzp xpos , ypos
  duration: .byte 1
- loop:    .byte 1  
-
+ loop:    .byte 1 
+ NotFalling: .byte 1
+ Jumping: .byte 1
 .segment "CODE"
  
  jsr @ControllerAction
 
 
+ lda NotFalling
+ cmp #$01
+ beq :+
+
+
+ 
 
  lda ypos
  cmp #$7f
  beq :+
  jsr Falling
+  
+
  :
+ 
+ lda #$00
+ sta NotFalling
+
  ldx #$00
  ldy #$00
+
 rts
 
 @ControllerAction:
-  ;  lda AButton
-  ;  and PRESSEDBUTTONS1
-  ;  cmp AButton
+   lda AButton
+   and PRESSEDBUTTONS1
+   cmp AButton
+   beq @AButton
 
    lda LEFT
    and PRESSEDBUTTONS1
@@ -63,6 +78,11 @@ rts
      jsr PlayerRightAction
    jmp @endActions
 
+
+   @AButton:
+     jsr PlayerJumpAction
+   ;end of AButton
+
    @endActions:
    
 
@@ -72,6 +92,7 @@ rts
 
  
 ;maybe move this to a generic file
+;makes the player fall whit a sertain amount of gravity
 ;subpixel value 
 Falling:
  @length = 3
@@ -166,5 +187,33 @@ PlayerRightAction:
  sta xpos+1
 rts
 
+PlayerJumpAction:
+
+ 
+ lda ypos
+ sta ValueToIncrease
+ lda ypos+1
+ sta ValueToIncrease+1
+
+ lda #$FF
+ sta StepValue
+ jsr INCREASE
+
+ lda ValueToIncrease
+ sta ypos
+ lda ValueToIncrease+1
+ sta ypos+1
+
+
+ lda Jumping
+ cmp #$05
+ beq :+
+
+ lda #$00
+ sta NotFalling
+ inc Jumping
+ :
+
+rts 
 
 .endproc
