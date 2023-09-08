@@ -11,7 +11,7 @@
 .import INCREASE , DECREASE , ADD
 .import counter
 .import AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
-.importzp ValueToIncrease, StepValue
+.importzp ValueToIncrease, StepValue ,ValueToDeCrease
 .importzp PRESSEDBUTTONS1
 
 .proc PLAYERPHYSICS
@@ -191,17 +191,17 @@ PlayerJumpAction:
 
  
  lda ypos
- sta ValueToIncrease
+ sta ValueToDeCrease
  lda ypos+1
- sta ValueToIncrease+1
+ sta ValueToDeCrease+1
 
  lda #$FF
  sta StepValue
- jsr INCREASE
+ jsr DECREASE
 
- lda ValueToIncrease
+ lda ValueToDeCrease
  sta ypos
- lda ValueToIncrease+1
+ lda ValueToDeCrease+1
  sta ypos+1
 
 

@@ -1,17 +1,17 @@
 ;decrease 16bit value whit a 8bit step value
 ;
- ValueToIncrease = $0
- StepValue = $2
+ ValueToDeCrease = $0
+ StepValue2 = $2
 .export DECREASE
-
+.export  ValueToDeCrease  ,StepValue2
 
 .proc DECREASE
  	clc		
-	lda ValueToIncrease+1
-	sbc #StepValue
-	sta ValueToIncrease+1
+	lda ValueToDeCrease+1
+	sbc #StepValue2
+	sta ValueToDeCrease+1
     bcc @CONTINUE             
-    dec ValueToIncrease
+    dec ValueToDeCrease
     @CONTINUE:
 rts 
 .endproc
