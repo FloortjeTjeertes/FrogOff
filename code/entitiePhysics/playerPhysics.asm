@@ -39,11 +39,15 @@
  lda ypos
  cmp #$7f
  beq :+
- jsr Falling
+  lda NotFalling
+  cmp #$01
+  beq :+
+ 
+  jsr Falling
   
 
  :
- 
+
  lda #$00
  sta NotFalling
 
@@ -82,7 +86,7 @@ rts
    @AButton:
      jsr PlayerJumpAction
    ;end of AButton
-
+     
    @endActions:
    
 
@@ -189,7 +193,6 @@ rts
 
 PlayerJumpAction:
 
- 
  lda ypos
  sta ValueToDeCrease
  lda ypos+1
@@ -207,12 +210,17 @@ PlayerJumpAction:
 
  lda Jumping
  cmp #$05
- beq :+
-
- lda #$00
+ bne :+
+  lda #$00
+  sta NotFalling
+  sta Jumping
+  rts 
+ :
+ 
+ lda #$01
  sta NotFalling
  inc Jumping
- :
+
 
 rts 
 
