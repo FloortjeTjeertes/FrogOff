@@ -39,8 +39,8 @@ LOAD:
     jsr LOADENTITIE
 
 
-    ; ldx #$00
-    ; jsr LOADENTITIE
+    ldx #$00
+    jsr LOADENTITIE
 
 
 

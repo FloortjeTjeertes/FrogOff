@@ -138,6 +138,7 @@ Falling:
  
 rts
 
+
 FallingValues:  .byte 80 , 100 , 200 , 255 
 Durations:      .byte 20 , 10 , 5 , 2
 ;check collision with the ground
@@ -201,6 +202,17 @@ PlayerJumpAction:
  lda #$FF
  sta StepValue
  jsr DECREASE
+
+ lda #$FF
+ sta StepValue
+ jsr DECREASE
+
+
+  lda #$FF
+ sta StepValue
+ jsr DECREASE
+
+
 
  lda ValueToDeCrease
  sta ypos
