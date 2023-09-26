@@ -14,7 +14,7 @@
 
 
 ;start address of entitie array
-EntitieArray = $03F8 
+EntitieArray = $03F7 
 MaxLength = 10
 Index = $00
 
@@ -26,6 +26,7 @@ Index = $00
   EntitieArrayLength: .res 1
   EmptySpace: .res 1
   Length: .res 1
+  
 
 .segment "CODE"
  ldy #$00
@@ -48,6 +49,7 @@ Index = $00
     tay 
 
 
+    iny 
     iny 
     iny 
     iny 

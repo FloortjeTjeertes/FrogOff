@@ -14,7 +14,9 @@
 
 EntitieArray = $0400
 Length = $02
-Adress = $03
+Adress = $03 ;2 bytes
+SelectedEntityIndex =$05
+
 
 
 
@@ -56,6 +58,8 @@ Adress = $03
      iny 
      iny 
 
+     sty SelectedEntityIndex
+
      tya 
      inx 
      stx Length 
@@ -67,7 +71,8 @@ rts
 
 
 SELECTENTITY:
-
+ 
+ ldy SelectedEntityIndex
  ;Adress 2 bytes (word)
  lda EntitieArray+2 ,y
  sta Adress
@@ -89,6 +94,8 @@ SELECTENTITY:
 rts
 
 RUNBEHAVIOUR:
+
+ 
  lda #$20
  sta ModifyingCode
  lda Adress
@@ -99,8 +106,14 @@ RUNBEHAVIOUR:
  lda #$60
  sta ModifyingCode+3
  
+ ;maybe store registers on the stack here
  jsr ModifyingCode
 
+
+ ;load entitie index back into y
+ sty SelectedEntityIndex
+  
+ 
  ;load posibly updated values back into array
  lda xpos
  sta EntitieArray+4 ,y
