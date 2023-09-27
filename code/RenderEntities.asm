@@ -75,6 +75,9 @@ EntitieArray = $03F8
 
     @endloop:
 ;  pla 
+   lda #$00
+   sta @Length
+   sta @index
 rts
 
 

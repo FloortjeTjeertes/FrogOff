@@ -13,8 +13,9 @@
 .export RUNENTITIEBEHAVIOUR
 
 EntitieArray = $0400
-Length = $02
-Adress = $03 ;2 bytes
+
+; Length = $02
+; Adress = $03 ;2 bytes
 SelectedEntityIndex =$05
 
 
@@ -32,7 +33,9 @@ SelectedEntityIndex =$05
   xpos: .res 2
   ypos: .res 2
   ModifyingCode: .res 4
-
+  ;maybe store these on the stack later
+  Length: .res 2
+  Adress:.res 2
 
 .segment "CODE"
     ldy #$00
@@ -48,6 +51,8 @@ SelectedEntityIndex =$05
       jsr SELECTENTITY
 
       jsr RUNBEHAVIOUR
+      
+      jsr CleanMemory
 
      iny 
      iny 
@@ -61,12 +66,16 @@ SelectedEntityIndex =$05
      sty SelectedEntityIndex
 
      tya 
+
+     ldx Length
      inx 
      stx Length 
 
       
     jmp @loop
     @endloop:
+
+    jsr CleanMemory
 rts
 
 
@@ -111,7 +120,7 @@ RUNBEHAVIOUR:
 
 
  ;load entitie index back into y
- sty SelectedEntityIndex
+ ldy SelectedEntityIndex
   
  
  ;load posibly updated values back into array
@@ -127,4 +136,32 @@ RUNBEHAVIOUR:
 
 rts
 
+;maybe put this in diverent file
+CleanMemory:
+ ldy #$00
+ ldx #$00
+ lda #$00
+ ;clean local ram
+ sta $00
+ sta $01
+ sta $02
+ sta $03
+ sta $04
+ sta $05
+ sta $08
+ sta $09
+ sta $0A
+ sta $0B
+ sta $0C
+ sta $0D
+ sta $0E
+ sta $0F
+
+
+
+
+ ldy #$00
+ ldx #$00
+
+rts
 .endproc
