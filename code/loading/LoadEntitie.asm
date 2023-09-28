@@ -14,7 +14,7 @@
 
 
 ;start address of entitie array
-EntitieArray = $03F7 
+EntitieArray = $03F8 
 MaxLength = 10
 Index = $00
 
@@ -57,7 +57,7 @@ Index = $00
     iny 
     iny 
     iny 
-    iny 
+    ; iny 
     ;load options into the array
     lda Entities,x
     sta EntitieArray,y

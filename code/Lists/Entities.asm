@@ -22,6 +22,6 @@ Entities:
 .byte 00       ; 
 .addr PLAYERPHYSICS
 .byte 00000001 ;status byte
-.byte 02       ; 
+.byte 03       ; 
 .addr PLAYERPHYSICS
 
