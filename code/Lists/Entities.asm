@@ -16,6 +16,7 @@
 ;   +-----------> 0 = not used yet
 
 .import PLAYERPHYSICS
+.import FLYPHYSICS
 
 Entities:
 .byte 00000001 ;status byte
@@ -23,5 +24,5 @@ Entities:
 .addr PLAYERPHYSICS
 .byte 00000001 ;status byte
 .byte 03       ; 
-.addr PLAYERPHYSICS
+.addr FLYPHYSICS
 
