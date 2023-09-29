@@ -13,13 +13,7 @@ ldx @Counter
 ldy #$00
 lda #$00
 
-; lda #$7F
-; dec @FlyHeight
-; sta xpos
 
-; lda #$7f
-; dec @FlyHeight
-; sta ypos
      
 
 
@@ -27,15 +21,19 @@ lda #$00
 
 
 
+    ; lda counter
+    lda #$6c
 
-    lda @CoordXHigh, X
+    adc @CoordXHigh, X
     adc @FlyWidth
     sta xpos
 
     lda @CoordXLow, X
     sta xpos+1
 
-    lda @CoordYHigh, X
+    ; lda counter
+    lda #$50
+    adc @CoordYHigh, X
     adc @FlyHeight
     sta ypos
 
@@ -44,10 +42,10 @@ lda #$00
 
     
 
-    ; lda counter
-    ; and #$1F
-    ; cmp #$1F
-    ; bne @skip
+    lda counter
+    and #$03
+    cmp #$03
+    bne @skip
 
 
 
@@ -68,11 +66,12 @@ ldx #$00
 
 
 rts
- 
-@CoordXHigh:  .byte 10 , 15 , 20 , 15, 10, 05 , 00
+
+@Multiplier = 2
+@CoordXHigh:  .byte 10*@Multiplier , 15*@Multiplier , 20*@Multiplier , 15*@Multiplier, 10*@Multiplier, 05*@Multiplier , 00*@Multiplier
 @CoordXLow:   .byte 00 , 00 , 00 , 00, 00, 00 , 00
 
-@CoordYHigh:  .byte 00  , 05 , 10 , 15, 20 ,15 ,10
+@CoordYHigh:  .byte 00*@Multiplier  , 05*@Multiplier , 10*@Multiplier , 15*@Multiplier, 20*@Multiplier ,15*@Multiplier ,10*@Multiplier
 @CoordYLow:   .byte 00  , 00 , 00 , 00, 00 ,00 ,00
 
 @FlyWidth: .byte 12
