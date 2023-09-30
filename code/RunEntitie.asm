@@ -16,7 +16,7 @@ EntitieArray = $0400
 
 ; Length = $02
 ; Adress = $03 ;2 bytes
-SelectedEntityIndex =$05
+; SelectedEntityIndex =$05
 
 
 
@@ -36,12 +36,13 @@ SelectedEntityIndex =$05
   ;maybe store these on the stack later
   Length: .res 2
   Adress:.res 2
-
+  SelectedEntityIndex: .res 1
 .segment "CODE"
     ldy #$00
     ldx #$00
     lda #$00
     sta Length
+    sta SelectedEntityIndex
  
     @loop:
      ldx Length 
@@ -53,6 +54,8 @@ SelectedEntityIndex =$05
       jsr RUNBEHAVIOUR
       
       jsr CleanMemory
+
+     ldy  SelectedEntityIndex
 
      iny 
      iny 
@@ -70,7 +73,8 @@ SelectedEntityIndex =$05
      ldx Length
      inx 
      stx Length 
-
+    
+   
       
     jmp @loop
     @endloop:

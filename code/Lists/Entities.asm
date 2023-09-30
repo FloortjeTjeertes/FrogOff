@@ -25,4 +25,6 @@ Entities:
 .byte 00000001 ;status byte
 .byte 03       ; 
 .addr FLYPHYSICS
-
+.byte 00000001 ;status byte
+.byte 01       ; 
+.addr PLAYERPHYSICS
