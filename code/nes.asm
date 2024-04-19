@@ -14,24 +14,49 @@
 
 
 JOYPAD1 = $4016
+JOYPAD2 = $4017
+CONTROLLER =$2000
+PPUMASK = $2001
+PPUSTATUS = $2002
+OAMADDR = $2003
+OAMDATA = $2004
+PPUSCROLL = $2005
+PPUADDR = $2006
+PPUDATA = $2007
+Oam = $0200
+Drawingbuf = $0300   
 
+ 
+; .include "loadMetaSprite.asm"
 
-
-
+ 
 
 .zeropage
-buttons: .res 1 ; 1 byte for buttons
+ 
+ .globalzp buttons , PPUMask ,PPUControlStatus, XScroll, YScroll , counter    
 
+  ;reserving space for local vars should do this in the linker cfg but eh
+  Local: .res 16
+ .importzp metaSpriteSlot
+ .importzp Mode
+ .importzp metaSpriteIndex
+ ;buttons imported from ButtonReading.asm
+ .importzp PRESSEDBUTTONS1 ,RELEASEDBUTTONS1
+  counter: .res 1 
+  XScroll: .res 1
+  YScroll: .res 1
+  PPUControlStatus: .res 1 ;shadow of PPUCTRL (soft $2000)
+  PPUMask:          .res 1 ;shadow of PPUMASK (soft $2001)
+  needdma:          .res 1
+  needdraw:         .res 1     
+  needppureg:       .res 1   
+  sleeping:         .res 1
 .segment "STARTUP"
 
 
 jsr WAITVBLANK
 
-
 jsr CLEANPPU
-
-
-
 
 RESET:
   sei          ; disable IRQs
@@ -41,12 +66,15 @@ RESET:
   ldx #$FF
   txs          ; Set up stack
   inx          ; now X = 0
-  stx $2000    ; disable NMI
-  stx $2001    ; disable rendering
+  stx CONTROLLER    ; disable NMI
+  stx PPUMASK    ; disable rendering
   stx $4010    ; disable DMC IRQs
+  
+  lda #$00    ;store 0 in acumulator to clear counter
+  sta counter ;store acumulator in counter (should be 0)
 
   jsr WAITVBLANK
-
+ 
 
 CLRMEM:
   sta $0000, x
@@ -71,257 +99,67 @@ CLRMEM:
   
 
   lda #$3F
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  sta PPUADDR ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
   lda #$00
-  sta $2006 ;store least significant value 00 in ppu write address ..00
+  sta PPUADDR ;store least significant value 00 in ppu write address ..00
 
-  ldx #$00
+  ldx #$00  
 
-LOADPALETTES:
-  lda PALLETEDATA, x
-  sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
-  inx 
-  cpx #$20
-  bne LOADPALETTES
-
-  ldx #$00
-  
-LOADSPRITES:
-  lda SPRITEDATA,x
-  sta $0200,x
-  inx
-  cpx #$20
-  bne LOADSPRITES
-
-
-LOADBACKGROUND:
-
-  lda #$20    ;load 20 into acumulator
-  sta $2006   ;stores most significant byte in ppu
-  lda #$00   ;stores least sugnificant byte in acumulator 
-  sta $2006   ;stores least significant byte in ppu
-
-  ldx #$00   ;load x with 0
-
-:
-  txa       ;transfer x to acumulator
-  sta $2007 ;stores acumulator in ppu address 2007
-  inx
-  cpx #$CE ;compare x with 255
-  bne :-
-
-
-;enable interupts
-  cli
-
-  lda #%10000000 ;enable nmi change background to use second char set
-  sta $2000  ;PPUCTRL ppu controll register
+  lda #%10001000 ;enable nmi change background to use first char set
+  sta CONTROLLER  ;PPUCTRL ppu controll register
+  sta PPUControlStatus ;shadow of PPUCTRL (soft $2000)
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
+  sta PPUMASK
+  sta PPUMask ;shadow of PPUMASK (soft $2001)
+
+
 
 .segment "CODE"
 
 ;program loop
 
+; clear c and y
+  ldx #$00
+  ldy #$00
 
-  jsr DISPLAYBACKGROUND
+;set game in mode 0 (title screen)
 
-
-
-ldx #$00
-ldy #$00
+lda #$00
+sta Mode
 
 LOOP:
 
-  lda DOWN ;enable sprites and backgrounds for left most 8 pixels
-  and buttons
-  cmp DOWN
-  beq MOVEDOWN
+  lda Mode
+  cmp #$00
+  bne :+
+   jsr TITLESCREEN
+  :
+  lda Mode
+  cmp #$01
+  bne :+
+    jsr SINGLEPLAYER
+  :
+  cmp #$02
+  bne :+
+    jsr DEBUG
+  :
 
-  lda UP ;enable sprites and backgrounds for left most 8 pixels
-  and buttons
-  cmp UP
-  beq MOVEUP
-
-  lda LEFT ;enable sprites and backgrounds for left most 8 pixels
-  and buttons
-  cmp LEFT
-  beq MOVELEFT
-
-  lda RIGHT ;enable sprites and backgrounds for left most 8 pixels
-  and buttons
-  cmp RIGHT
-  beq MOVERIGHT
-
-
- LABEL:
- tya
- jsr MOVEBLOCK
-
+  jsr DoFrame
 jmp LOOP
 
-MOVEDOWN:
-  iny
-  jmp LABEL
-
-MOVEUP:
-  dey
-  jmp LABEL
-
-MOVERIGHT:
-  inx
-  jmp LABEL
-
-MOVELEFT:
-  dex
-  jmp LABEL
-
-MOVEBLOCK:
- 
- 
-
-jsr WAITVBLANK
 
 
-  
-tya
-sta $0200
-sta $0204
-adc #$08
-sta $0208
-sta $020c
+.import LOAD_META_SPRITE
 
-; adc #$01
-; sta $0208
-; sta $020c 
+.import LOADBACKGROUND
 
+.import TITLESCREEN
 
+.import SINGLEPLAYER
 
-txa
-sta $0203
-sta $020B
-adc #$08
-sta $0207
-sta $020F
+.import DEBUG
 
-
-
- 
-; ldx #$00
-; ldy #$00
-
-rts
-
-
-DISPLAYBACKGROUND:
-
-
-  lda #%00000000   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
-  sei
-
-  lda #$28
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
-  lda #$C0
-  sta $2006 ;store least significant value 00 in ppu write address ..00
-
-  ldx #$00
-  
-
-  lda #$20    ; load the value 32 into the accumulator
-  sta $2006   ; store the most significant byte in the PPU write address (0x2006)
-  lda #$00    ; load the value 0 into the accumulator
-  sta $2006   ; store the least significant byte in the PPU write address (0x2006)
-  
-  ldx #$00    ; load the value 0 into the X register
-
-  
-  :
-  lda MAPDATA,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-
- ldx #$00    ; load the value 0 into the X register
-
-
-  :
-  lda MAPDATA+255,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-   
- ldx #$00    ; load the value 0 into the X register
-
-  :
-  lda MAPDATA+510,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-  ldx #$00    ; load the value 0 into the X register
-   :
-  lda MAPDATA+765,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$FF ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
-  
-  ldx #$00    ; load the value 0 into the X register
-    :
-  lda MAPDATA+1020,x   ; load the value at the address stored in X and Y into the accumulator
-  sta $2007   ; store the value in the PPU data register (0x2007)
-  inx         ; increment the X register
-  cpx #$05 ; compare X with the value 4096 (the size of a nametable in bytes)
-  bne :-
- 
-
-  cli
-
-  lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
-  sta $2001
- 
-
-rts
-
-
-BACKGROUNDFLICKER:
-  lda #$3F
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
-  lda #$00
-  sta $2006 
-  ldx $0000
-  inx
-  stx $0000
-  lda $0000
-  sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
-  lda #$26
-  sta $2007
-  lda #$27
-  sta $2007
-  lda #$28
-  sta $2007
-  cpx #$3f
-
-rts
-
-
-;shifts 1 every loop until 8 bits are shifted from the nes controller
-;the status of the controller is stored every loop in the buttons
-READCONTROLLER: 
-    lda #$01 
-    sta JOYPAD1 ;write 1 to joypad 1
-    sta buttons ;write 1 to buttons
-    lsr a   ; shifts 1 out of acumulator to make acumulator 0
-    sta JOYPAD1 ;write aculumator (0) to joypad 1 (clears strobe bit and controller will keep stored value (pressed buttons) static
-      :                                                                    
-      lda JOYPAD1 ;read joypad 1 into acumulator                           
-      lsr a ;shift left shifts red byte to form a full 8 bits of the read controller                                                
-      rol buttons ;shift left to eventually put 1 in carry (looping trough all bits in the buttons variable)      
-      bcc :- ;branch to last ":" if carry flag is not set
-rts
+.import READCONTROLLER
 
 
 
@@ -329,62 +167,131 @@ CLEANPPU:
   lda #$02 ;select most significant bite
   sta $4014 ;OAMDMA address
   nop
-  
-
+rts
 WAITVBLANK:
-  BIT $2002 ;test if vblank is the same as address  2002 if negative flag is not high 
+  BIT PPUSTATUS ;test if vblank is the same as address  2002 if negative flag is not high 
   BPL WAITVBLANK
 
-  rts
+rts
+
+WaitFrame:
+  inc sleeping
+    @loop:
+      lda sleeping
+      bne @loop
+rts
+
+DoFrame:
+     lda #1
+     sta needdraw
+     sta needdma
+     sta needppureg
+     jsr WaitFrame
+     jsr READCONTROLLER
+     inc counter
+rts
+
+; DoDrawing:
+
+;   lda #$0300,x
+;   sta PPUDATA,x
+;   jmp DoDrawing
+
+; rts
+
+NMI: ;nmi or vblank what happens in the vblank
 
 
-VBLANK: ;nmi or vblank what happens in the vblank
-  LDA #$02 ;copy sprite data from 0200 -> ppu memory for display
-  sta $4014
-  jsr READCONTROLLER
-  rti
+     pha         
+     txa
+     pha
+     tya
+     pha
+
+     lda needdma
+     beq :+
+       lda #0      ; do sprite DMA
+       sta $2003   ; conditional via the 'needdma' flag
+       lda #>Oam
+       sta $4014
+
+  :  lda needdraw       ; do other PPU drawing (NT/Palette/whathaveyou)
+     beq :+             ;  conditional via the 'needdraw' flag
+       bit $2002        ; clear VBl flag, reset $2005/$2006 toggle
+       ;jsr DoDrawing    ; draw the stuff from the drawing buffer
+       dec needdraw
+
+  :  lda needppureg
+     beq :+
+       lda PPUMask   ; copy buffered $2000/$2001 (conditional via needppureg)
+       sta $2001
+       lda PPUControlStatus
+       sta $2000
+
+
+       bit $2002
+       lda XScroll    ; set X/Y scroll (conditional via needppureg)
+       sta $2005
+       lda YScroll
+       sta $2005
+
+
+
+   :
+   ;music engine can go here
+
+   
+   lda #0         ; clear the sleeping flag so that WaitFrame will exit
+   sta sleeping
+
+     pla            ; restore regs and exit
+     tay
+     pla
+     tax
+     pla
+     
+rti
 
 
 
 
+SELECTGAMEMODE:
+       asl A
+       tax
+       lda GAMEMODES+1,x
+       pha
+       lda GAMEMODES,x
+       pha
+rts
+GAMEMODES:
+  .word TITLESCREEN-1 , SINGLEPLAYER-1, DEBUG-1
+
+.global AButton, BButton, SELECT, START, UP, DOWN, LEFT, RIGHT
 AButton:
-.byte %10000000
+ .byte %10000000
 BButton:
-.byte %01000000
+ .byte %01000000
 SELECT: 
-.byte %00100000
+ .byte %00100000
 START:  
-.byte %00010000
+ .byte %00010000
 UP:     
-.byte %00001000
+ .byte %00001000
 DOWN:   
-.byte %00000100
+ .byte %00000100
 LEFT:   
-.byte %00000010
+ .byte %00000010
 RIGHT:  
-.byte %00000001
-PALLETEDATA:
-  .byte $00,$00,$10,$20,$07,$16,$25,$30,$00,$21,$31,$30,$00,$27,$06,$00  ;background palette data
-  .byte $0D,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18,$22,$16,$27,$18;sprite palette data
+ .byte %00000001
 
-SPRITEDATA:
-  .byte $08, $9a, $02, $00
-  .byte $08, $9b, $02, $08
-  .byte $10, $aa, $02, $00
-  .byte $10, $ab, $02, $08
-  .byte $18, $9c, $07, $00
-  .byte $18, $9d, $07, $08
-  .byte $20, $ac, $07, $00
-  .byte $20, $ad, $07, $08
 
-MAPDATA:
- .incbin "../resource/test.nam"
+
+
 
 
 .segment "VECTORS"
-    .word VBLANK
+    .word NMI
     .word RESET
-
 .segment "CHARS"  
-      .incbin "../resource/elementzones.chr"
-      
+      .incbin "../resource/Tiles/PlatformSprites.chr"
+      .incbin "../resource/Tiles/MovingSprites.chr"

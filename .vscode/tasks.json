@@ -6,9 +6,10 @@
         {
             "label": "Build NES project",
             "type": "shell",
-            "command": "./tools/make.bat",
+            "command": "make | ./tools/build.bat | etc...",
             "problemMatcher": [
                 {
+		    "owner": "nesdev",
                     "pattern": [
                         {
                             "regexp": "^([^:]*):([0-9]+): ?([^:]*): ?(.*)$",
@@ -20,6 +21,7 @@
                     ]
                 },
                 {
+		    "owner": "nesdev",
                     "pattern": [
                         {
                             "regexp": "^([^:]*)\\(([0-9]+)\\): ?([^:]*): ?(.*)$",
