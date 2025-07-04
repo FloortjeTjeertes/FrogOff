@@ -239,7 +239,7 @@ NMI: ;nmi or vblank what happens in the vblank
 
    :
    ;music engine can go here
-
+  
    
    lda #0         ; clear the sleeping flag so that WaitFrame will exit
    sta sleeping
