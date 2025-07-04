@@ -87,21 +87,21 @@ SELECTENTITY:
  
  ldy SelectedEntityIndex
  ;Adress 2 bytes (word)
- lda EntitieArray+2 ,y
- sta Adress
  lda EntitieArray+3 ,y
+ sta Adress
+ lda EntitieArray+4 ,y
  sta Adress+1
 
  ;Xposition 2 bytes (word)
- lda EntitieArray+4 ,y
- sta xpos
  lda EntitieArray+5 ,y
+ sta xpos
+ lda EntitieArray+6 ,y
  sta xpos+1
 
  ;Yposition 2 bytes (word)
- lda EntitieArray+6 ,y
- sta ypos
  lda EntitieArray+7 ,y
+ sta ypos
+ lda EntitieArray+8 ,y
  sta ypos+1
 
 rts

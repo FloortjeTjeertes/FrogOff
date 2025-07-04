@@ -9,13 +9,17 @@ EntitieArray = $03F8
 
 .proc RENDER
 .segment "LOCAL"
+  AnimationAddress = $05
   @Length = $02
   @index = $03
+
+
 .zeropage
  .importzp EntitieArrayLength 
  .importzp metaSpriteIndex , metaSpriteSlot
  .importzp  TotalSpriteLength
  .importzp  xpos, ypos
+
 
 .segment "CODE"
 
@@ -57,11 +61,11 @@ EntitieArray = $03F8
     ;set the x and y position memory to the current (likely updated) position of the entity 16 bites per coordinate)
     ;sub pixels are ignored as they are not needed for the ppu
     ;X position
-    lda EntitieArray+4,y
+    lda EntitieArray+5,y
     sta xpos
 
     ;Y position
-    lda EntitieArray+6,y
+    lda EntitieArray+7,y
     sta ypos
 
     
@@ -106,8 +110,23 @@ rts
     rts 
 
     RENDERINFORGROUND:
+        ; might move this to seperate subroutine for animation
+
+
+
+        ;load the tile entry low byte
         lda EntitieArray+1,y
+        sta AnimationAddress+1
+
+        ;load the tile entry high byte
+        lda EntitieArray+2,y
+        sta AnimationAddress
+
+
+        ldy #$00
+        lda (AnimationAddress), y
         sta metaSpriteIndex
+
         inc metaSpriteSlot
         jsr LOAD_META_SPRITE
     rts 

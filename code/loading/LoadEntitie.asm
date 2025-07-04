@@ -1,4 +1,4 @@
-; loads entities into a list ot be used by the stage.
+; loads entities into a list to be used by the stage.
 ; the entities in this stage will be accessed and there behavior will be called by the stage.
 ; the entities loaded from a list of entities in the format .
 ; #$ForeGroundBackground,#$tileEntry, #$AIAddressLow , #$AIAddressHigh 
@@ -56,32 +56,41 @@ Index = $00
     iny 
     iny 
     iny     
-    ; iny
+
+    ;maybe us a table whit pointers pointing to the start of each entities data
+
     ;load options into the array
     lda Entities,x
     sta EntitieArray,y
 
-    ;load the tile entry
+    ;load the tile entry low byte
     lda Entities+1,x
     sta EntitieArray+1,y
 
-    ;load the AI address low byte
     lda Entities+2,x
     sta EntitieArray+2,y
+    
 
-    ;load the AI address high byte
+    ;load the AI address low byte
     lda Entities+3,x
     sta EntitieArray+3,y
+
+    ;load the AI address high byte
+    lda Entities+4,x
+    sta EntitieArray+4,y
+
+
+
 
     ;set the position of the entity to 0 (16 bites per coordinate)
     ;X position
     lda #$00
-    sta EntitieArray+4,y
     sta EntitieArray+5,y
+    sta EntitieArray+6,y
     
     ;Y position
-    sta EntitieArray+6,y
     sta EntitieArray+7,y
+    sta EntitieArray+8,y
 
   
     inc EntitieArrayLength
@@ -109,6 +118,8 @@ rts
     bne  :-
   @skip:
 rts
+
+
 
 
 

@@ -22,8 +22,8 @@ EntitieLlength = 4
 
 Entities:
 .byte 00000001 ;status byte
-.byte 00       ; 
-; .addr Animations
+; .byte 00       ; 
+.addr Animations
 .addr PLAYERPHYSICS
 
 .byte 00000001 ;status byte
@@ -39,12 +39,13 @@ Entities:
 .addr FLYPHYSICS
 
 
+;maybe us a table whit pointers pointing to the start of each entities data
 
 
 
 ;look up table for the animations that the entities can use
 Animations:
 
-.byte Animation
+.addr Animation
 
 .include "../Lists/Animations.asm"
