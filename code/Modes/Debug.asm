@@ -1,6 +1,7 @@
 .export DEBUG
 
-
+.import RENDER
+.import RUNENTITYBEHAVIOUR
 
 
 .proc DEBUG
@@ -57,5 +58,5 @@ rts
 .import LOADBACKGROUND
 .import LOADENTITIE
 .import RENDER
-.import RUNENTITYBEHAVIOUR
+.import RUNENTITIEBEHAVIOUR
 .endproc

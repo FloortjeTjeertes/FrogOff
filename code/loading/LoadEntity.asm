@@ -22,7 +22,7 @@
 
 
 ;start address of entity array
-EntityArray = $03F8 
+EntityArray = $0400 
 MaxLength = 10
 Index = $00
 
@@ -52,20 +52,19 @@ Index = $00
  bne @LOAD
  ldy EmptySpace
 @LOAD:
+    lda Length ;load the length of the entity array     
+    asl 
+    asl 
+    asl 
+    tay ; Y = offset for next entity (Length * 8 for runtime storage)
+
+    ; Calculate source entity offset (X = Length * 4 for source data)
     lda Length
-    tay 
+    asl
+    asl  
+    tax ; X = source offset (Length * 4)
 
-
-    iny 
-    iny 
-    iny 
-    iny 
-    iny 
-    iny 
-    iny 
-    iny     
-
-    ;maybe us a table whit pointers pointing to the start of each entities data
+    ;maybe us a table with pointers pointing to the start of each entities data
 
     ;load options into the array
     lda Entities,x
@@ -86,9 +85,6 @@ Index = $00
     ;load the AI address high byte
     lda Entities+4,x
     sta EntityArray+4,y
-
-
-
 
     ;set the position of the entity to 0 (16 bites per coordinate)
     ;X position

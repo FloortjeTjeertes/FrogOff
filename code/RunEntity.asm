@@ -5,7 +5,7 @@
 ; inports: EntityArrayLength
 ; exports: xpos, ypos
 ;
-; Local vars: Length, Address, ModifyingCode
+; Local vars: Length, Adress, ModifyingCode
 ;
 ; uses: EntityArray
 
@@ -15,7 +15,7 @@
 EntityArray = $0400
 
 ; Length = $02
-; Address = $03 ;2 bytes
+; Adress = $03 ;2 bytes
 ; SelectedEntityIndex =$05
 
 
@@ -32,10 +32,11 @@ EntityArray = $0400
 
   xpos: .res 2
   ypos: .res 2
-  ModifyingCode: .res 4
+  ; Place ModifyingCode at a fixed, safe zero page address
+  ModifyingCode = $F0  ; Use $F0-$F3 for the 4-byte indirect jump code
   ;maybe store these on the stack later
   Length: .res 2
-  Address:.res 2
+  Adress:.res 2
   SelectedEntityIndex: .res 1
 .segment "CODE"
     ldy #$00
@@ -55,26 +56,14 @@ EntityArray = $0400
       
       jsr CleanMemory
 
-     ldy  SelectedEntityIndex
+     ; Move to next entity (8 bytes per entity)
+     lda SelectedEntityIndex
+     clc
+     adc #8
+     sta SelectedEntityIndex
 
-     iny 
-     iny 
-     iny 
-     iny 
-     iny 
-     iny 
-     iny 
-     iny 
-
-     sty SelectedEntityIndex
-
-     tya 
-
-     ldx Length
-     inx 
-     stx Length 
-    
-   
+     ; Increment entity counter  
+     inc Length
       
     jmp @loop
     @endloop:
@@ -86,11 +75,11 @@ rts
 SELECTENTITY:
  
  ldy SelectedEntityIndex
- ;Address 2 bytes (word)
+ ;Adress 2 bytes (word) in standard least significant byte first format
+ lda EntityArray+2 ,y
+ sta Adress
  lda EntityArray+3 ,y
- sta Address
- lda EntityArray+4 ,y
- sta Address+1
+ sta Adress+1
 
  ;Xposition 2 bytes (word)
  lda EntityArray+5 ,y
@@ -107,65 +96,59 @@ SELECTENTITY:
 rts
 
 RUNBEHAVIOUR:
+ ; Store current registers to prevent corruption
+ pha
+ txa
+ pha
+ tya
+ pha
 
- 
- lda #$20
+ ; Build JSR instruction in a safe zero page area
+ lda #$20           ; JSR opcode
  sta ModifyingCode
- lda Address
+ lda Adress
  sta ModifyingCode+1
- lda Address+1
+ lda Adress+1
  sta ModifyingCode+2
-
- lda #$60
+ lda #$60           ; RTS opcode
  sta ModifyingCode+3
  
- ;maybe store registers on the stack here
+ ; Call the AI function
  jsr ModifyingCode
 
+ ; Restore registers
+ pla
+ tay
+ pla
+ tax
+ pla
 
- ;load entitie index back into y
+ ; Load entity index back into y
  ldy SelectedEntityIndex
   
  
  ;load posibly updated values back into array
  lda xpos
- sta EntityArray+4 ,y
- lda xpos+1
  sta EntityArray+5 ,y
+ lda xpos+1
+ sta EntityArray+6 ,y
 
  lda ypos
- sta EntityArray+6 ,y
- lda ypos+1
  sta EntityArray+7 ,y
+ lda ypos+1
+ sta EntityArray+8 ,y
 
 rts
 
 ;maybe put this in diverent file
 CleanMemory:
+ ; Don't clear ANY zero page variables while entities are running!
+ ; The ModifyingCode, xpos, ypos, etc. are all in zero page and being used
+ 
+ ; Only clear non-zero page registers
  ldy #$00
  ldx #$00
  lda #$00
- ;clean local ram
- sta $00
- sta $01
- sta $02
- sta $03
- sta $04
- sta $05
- sta $08
- sta $09
- sta $0A
- sta $0B
- sta $0C
- sta $0D
- sta $0E
- sta $0F
-
-
-
-
- ldy #$00
- ldx #$00
 
 rts
 .endproc

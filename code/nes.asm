@@ -161,6 +161,9 @@ jmp LOOP
 
 .import READCONTROLLER
 
+.import RENDER
+
+
 
 
 CLEANPPU:
