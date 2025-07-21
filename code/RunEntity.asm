@@ -2,32 +2,32 @@
 ; 
 ; runs entitie behaviour
 ;
-; inports: EntitieArrayLength
+; inports: EntityArrayLength
 ; exports: xpos, ypos
 ;
-; Local vars: Length, Adress, ModifyingCode
+; Local vars: Length, Address, ModifyingCode
 ;
-; uses: EntitieArray
+; uses: EntityArray
 
 
-.export RUNENTITIEBEHAVIOUR
+.export RUNENTITYBEHAVIOUR
 
-EntitieArray = $0400
+EntityArray = $0400
 
 ; Length = $02
-; Adress = $03 ;2 bytes
+; Address = $03 ;2 bytes
 ; SelectedEntityIndex =$05
 
 
 
 
-.proc RUNENTITIEBEHAVIOUR
+.proc RUNENTITYBEHAVIOUR
 
 .segment "LOCAL"
  
   
 .zeropage 
- .importzp EntitieArrayLength 
+ .importzp EntityArrayLength 
  .exportzp xpos, ypos
 
   xpos: .res 2
@@ -35,7 +35,7 @@ EntitieArray = $0400
   ModifyingCode: .res 4
   ;maybe store these on the stack later
   Length: .res 2
-  Adress:.res 2
+  Address:.res 2
   SelectedEntityIndex: .res 1
 .segment "CODE"
     ldy #$00
@@ -46,7 +46,7 @@ EntitieArray = $0400
  
     @loop:
      ldx Length 
-     cpx EntitieArrayLength
+     cpx EntityArrayLength
      beq @endloop
       
       jsr SELECTENTITY
@@ -86,22 +86,22 @@ rts
 SELECTENTITY:
  
  ldy SelectedEntityIndex
- ;Adress 2 bytes (word)
- lda EntitieArray+3 ,y
- sta Adress
- lda EntitieArray+4 ,y
- sta Adress+1
+ ;Address 2 bytes (word)
+ lda EntityArray+3 ,y
+ sta Address
+ lda EntityArray+4 ,y
+ sta Address+1
 
  ;Xposition 2 bytes (word)
- lda EntitieArray+5 ,y
+ lda EntityArray+5 ,y
  sta xpos
- lda EntitieArray+6 ,y
+ lda EntityArray+6 ,y
  sta xpos+1
 
  ;Yposition 2 bytes (word)
- lda EntitieArray+7 ,y
+ lda EntityArray+7 ,y
  sta ypos
- lda EntitieArray+8 ,y
+ lda EntityArray+8 ,y
  sta ypos+1
 
 rts
@@ -111,9 +111,9 @@ RUNBEHAVIOUR:
  
  lda #$20
  sta ModifyingCode
- lda Adress
+ lda Address
  sta ModifyingCode+1
- lda Adress+1
+ lda Address+1
  sta ModifyingCode+2
 
  lda #$60
@@ -129,14 +129,14 @@ RUNBEHAVIOUR:
  
  ;load posibly updated values back into array
  lda xpos
- sta EntitieArray+4 ,y
+ sta EntityArray+4 ,y
  lda xpos+1
- sta EntitieArray+5 ,y
+ sta EntityArray+5 ,y
 
  lda ypos
- sta EntitieArray+6 ,y
+ sta EntityArray+6 ,y
  lda ypos+1
- sta EntitieArray+7 ,y
+ sta EntityArray+7 ,y
 
 rts
 

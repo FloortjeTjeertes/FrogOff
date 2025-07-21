@@ -15,19 +15,20 @@
 ;   |+----------> 0 = not used yet
 ;   +-----------> 0 = not used yet
 
-EntitieLlength = 4
+EntityLlength = 4
 
 .import PLAYERPHYSICS
 .import FLYPHYSICS
 
 Entities:
 .byte 00000001 ;status byte
-; .byte 00       ; 
-.addr Animations
+.byte 00       ; 
+; .addr Animations
 .addr PLAYERPHYSICS
 
 .byte 00000001 ;status byte
 .byte 03       ; 
+; .addr Animations
 .addr FLYPHYSICS
 
 .byte 00000001 ;status byte
@@ -35,7 +36,7 @@ Entities:
 .addr PLAYERPHYSICS
 
 .byte 00000001 ;status byte
-.byte 03       ; 
+.byte 03       ;
 .addr FLYPHYSICS
 
 

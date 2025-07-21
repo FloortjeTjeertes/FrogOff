@@ -4,7 +4,7 @@
 .import LOAD_META_SPRITE
 .import CLEAR_METASPRITES
 
-EntitieArray = $03F8
+EntityArray = $03F8
 
 
 .proc RENDER
@@ -15,7 +15,7 @@ EntitieArray = $03F8
 
 
 .zeropage
- .importzp EntitieArrayLength 
+ .importzp EntityArrayLength 
  .importzp metaSpriteIndex , metaSpriteSlot
  .importzp  TotalSpriteLength
  .importzp  xpos, ypos
@@ -42,7 +42,7 @@ EntitieArray = $03F8
      ldy @Length 
      
      ldx @index
-     cpx EntitieArrayLength
+     cpx EntityArrayLength
      beq @endloop
 
      ;increase the length for the array pointer by one entry length
@@ -61,21 +61,21 @@ EntitieArray = $03F8
     ;set the x and y position memory to the current (likely updated) position of the entity 16 bites per coordinate)
     ;sub pixels are ignored as they are not needed for the ppu
     ;X position
-    lda EntitieArray+5,y
+    lda EntityArray+5,y
     sta xpos
 
     ;Y position
-    lda EntitieArray+7,y
+    lda EntityArray+7,y
     sta ypos
 
     
-     lda EntitieArray,y
+     lda EntityArray,y
      and #%00000000
      cmp #$01
      beq @background
 
 
-     lda EntitieArray,y
+     lda EntityArray,y
      and #%00000001
      cmp #$01
      beq @foreground
@@ -106,7 +106,7 @@ rts
 
 
     RENDERINBACKGEOUND:
-        lda EntitieArray+1,y
+        lda EntityArray+1,y
     rts 
 
     RENDERINFORGROUND:
@@ -115,11 +115,11 @@ rts
 
 
         ;load the tile entry low byte
-        lda EntitieArray+1,y
+        lda EntityArray+1,y
         sta AnimationAddress+1
 
         ;load the tile entry high byte
-        lda EntitieArray+2,y
+        lda EntityArray+2,y
         sta AnimationAddress
 
 

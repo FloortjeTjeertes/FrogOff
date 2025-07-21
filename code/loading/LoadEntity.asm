@@ -1,5 +1,13 @@
 ; loads entities into a list to be used by the stage.
-; the entities in this stage will be accessed and there behavior will be called by the stage.
+; the entities in this stage     ;set the position of the entity to 0 (16 bits per coordinate)
+    ;X position
+    lda #$00
+    sta EntityArray+4,y
+    sta EntityArray+5,y
+    
+    ;Y position
+    sta EntityArray+6,y
+    sta EntityArray+7,y ;accessed and their behavior will be called by the stage.
 ; the entities loaded from a list of entities in the format .
 ; #$ForeGroundBackground,#$tileEntry, #$AIAddressLow , #$AIAddressHigh 
 ;
@@ -8,13 +16,13 @@
 ;               +===========+
 ;               |  EXPORTS  |                         
 ;               +===========+
-;  EntitieArrayLength = the amount of entities in the Array/Stage
+;  EntityArrayLength = the amount of entities in the Array/Stage
 ;
 ;
 
 
-;start address of entitie array
-EntitieArray = $03F8 
+;start address of entity array
+EntityArray = $03F8 
 MaxLength = 10
 Index = $00
 
@@ -22,8 +30,8 @@ Index = $00
 
 .proc LOADENTITIE
 .zeropage
-  .exportzp EntitieArrayLength , EmptySpace
-  EntitieArrayLength: .res 1
+  .exportzp EntityArrayLength , EmptySpace
+  EntityArrayLength: .res 1
   EmptySpace: .res 1
   Length: .res 1
   
@@ -32,7 +40,7 @@ Index = $00
  ldy #$00
 
 
- lda EntitieArrayLength
+ lda EntityArrayLength
  ;if index is first place in array skip empty space check
  cmp #$00 
  beq @LOAD
@@ -61,23 +69,23 @@ Index = $00
 
     ;load options into the array
     lda Entities,x
-    sta EntitieArray,y
+    sta EntityArray,y
 
     ;load the tile entry low byte
     lda Entities+1,x
-    sta EntitieArray+1,y
+    sta EntityArray+1,y
 
     lda Entities+2,x
-    sta EntitieArray+2,y
+    sta EntityArray+2,y
     
 
     ;load the AI address low byte
     lda Entities+3,x
-    sta EntitieArray+3,y
+    sta EntityArray+3,y
 
     ;load the AI address high byte
     lda Entities+4,x
-    sta EntitieArray+4,y
+    sta EntityArray+4,y
 
 
 
@@ -85,15 +93,15 @@ Index = $00
     ;set the position of the entity to 0 (16 bites per coordinate)
     ;X position
     lda #$00
-    sta EntitieArray+5,y
-    sta EntitieArray+6,y
+    sta EntityArray+5,y
+    sta EntityArray+6,y
     
     ;Y position
-    sta EntitieArray+7,y
-    sta EntitieArray+8,y
+    sta EntityArray+7,y
+    sta EntityArray+8,y
 
   
-    inc EntitieArrayLength
+    inc EntityArrayLength
 
 
     
@@ -103,7 +111,7 @@ rts
 
 @increaser:
   :
-    cpx EntitieArrayLength
+    cpx EntityArrayLength
     bne @skip
      iny 
      iny 
@@ -113,7 +121,7 @@ rts
      iny 
      iny 
      iny 
-     iny 
+     iny  
      inx    
     bne  :-
   @skip:

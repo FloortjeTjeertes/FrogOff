@@ -6,11 +6,11 @@ PPUDATA = $2007
 PPUMASK = $2001
 temp = $00
 ; MapDataAddress = $00
-; PalleteAdress = $02
+; PalleteAddress = $02
 .proc LOADBACKGROUND
 .zeropage
   MapDataAddress: .res 2
-  PalleteAdress: .res 2
+  PalleteAddress: .res 2
 
 
 .segment "CODE"
@@ -44,9 +44,9 @@ GetBackgroundFromArray:
   sta MapDataAddress+1
 
   lda BACKGROUNDLIST+2, x
-  sta PalleteAdress
+  sta PalleteAddress
   lda BACKGROUNDLIST+3, x
-  sta PalleteAdress+1
+  sta PalleteAddress+1
 
 rts
 
@@ -54,7 +54,7 @@ LoadBackgroundPalletes:
   ldy #$00
   :
 
-  lda (PalleteAdress), y
+  lda (PalleteAddress), y
   sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
   iny 
   cpy #$10

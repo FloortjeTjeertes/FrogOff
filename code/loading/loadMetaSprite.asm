@@ -11,11 +11,11 @@ OAM_END = $02FF
   .exportzp  TotalSpriteLength := $50
   .importzp  xpos, ypos
   ; local variables
-  Meta_Sprite_Start_Adress_last_byte: .res 1
-  Meta_Sprite_Start_Adress_first_byte: .res 1
-  MetaSpriteAtributeAdress: .res 2
-  MetaSpriteXPositionAdress: .res 2
-  MetaSpriteYPositionAdress: .res 2
+  Meta_Sprite_Start_Address_last_byte: .res 1
+  Meta_Sprite_Start_Address_first_byte: .res 1
+  MetaSpriteAtributeAddress: .res 2
+  MetaSpriteXPositionAddress: .res 2
+  MetaSpriteYPositionAddress: .res 2
   metaSpriteLength: .res 1
   ; TotalSpriteLength: .res 1
   metaOffset: .res 1
@@ -72,27 +72,27 @@ OAM_END = $02FF
   sta metaSpriteLength     
   ;load the adress of the meta sprite                  
   lda META_LOOKUP_TABLE+1, x   ; load the second part of where the tile data is stored
-  sta Meta_Sprite_Start_Adress_last_byte
+  sta Meta_Sprite_Start_Address_last_byte
   lda META_LOOKUP_TABLE+2, x   ; load the first part of where the tile data is stored
-  sta Meta_Sprite_Start_Adress_first_byte  
+  sta Meta_Sprite_Start_Address_first_byte  
   
   ; load metasprite Atributes
   lda META_LOOKUP_TABLE+3, x
-  sta MetaSpriteAtributeAdress           
+  sta MetaSpriteAtributeAddress           
   lda META_LOOKUP_TABLE+4, x
-  sta MetaSpriteAtributeAdress+1    
+  sta MetaSpriteAtributeAddress+1    
 
   ; load metasprite X position
   lda META_LOOKUP_TABLE+5, x
-  sta MetaSpriteXPositionAdress           
+  sta MetaSpriteXPositionAddress           
   lda META_LOOKUP_TABLE+6, x
-  sta MetaSpriteXPositionAdress+1  
+  sta MetaSpriteXPositionAddress+1  
 
   ; load metasprite Y position    
   lda META_LOOKUP_TABLE+7, x
-  sta MetaSpriteYPositionAdress           
+  sta MetaSpriteYPositionAddress           
   lda META_LOOKUP_TABLE+8, x
-  sta MetaSpriteYPositionAdress+1   
+  sta MetaSpriteYPositionAddress+1   
 
   ;ofsets the full metasprite in the oam
   ; Initialize Y register
@@ -142,20 +142,20 @@ OAM_END = $02FF
 
     ; Load the tile data
     ; Store the tile data in the $0200 range
-    lda (Meta_Sprite_Start_Adress_last_byte),y         
+    lda (Meta_Sprite_Start_Address_last_byte),y         
     sta OAM_START+1,x  
     ; Load the Y position data
     ; Store the Y position in the OAM address register
-    lda (MetaSpriteYPositionAdress),y   
+    lda (MetaSpriteYPositionAddress),y   
     adc ypos
     sta OAM_START,x                  
     ; Load the attribute data
     ; Store the attribute data in the $0200 range
-    lda (MetaSpriteAtributeAdress),y         
+    lda (MetaSpriteAtributeAddress),y         
     sta OAM_START+2,x                 
     ; Load the X position data
     ; Store the X position in the $0200 range
-    lda (MetaSpriteXPositionAdress),y      
+    lda (MetaSpriteXPositionAddress),y      
     adc xpos
     sta OAM_START+3,x                 
 
