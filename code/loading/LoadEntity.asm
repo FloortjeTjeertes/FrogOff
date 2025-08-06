@@ -30,40 +30,31 @@ Index = $00
 
 .proc LOADENTITIE
 .zeropage
-  .exportzp EntityArrayLength , EmptySpace
+  .exportzp EntityArrayLength ;, EmptySpace
   EntityArrayLength: .res 1
-  EmptySpace: .res 1
-  Length: .res 1
-  
+  TempEntityNum: .res 1
 
 .segment "CODE"
- ldy #$00
-
-
- lda EntityArrayLength
- ;if index is first place in array skip empty space check
- cmp #$00 
- beq @LOAD
- 
-;  jsr @increaser
-
- ;if the index is not the same as the empty space do not use the empty space index as the index
- cmp EmptySpace
- bne @LOAD
- ldy EmptySpace
 @LOAD:
-    lda Length ;load the length of the entity array     
-    asl 
-    asl 
-    asl 
-    tay ; Y = offset for next entity (Length * 8 for runtime storage)
+    stx TempEntityNum ; Store the current entity number in TempEntityNum
 
-    ; Calculate source entity offset (X = Length * 4 for source data)
-    lda Length
-    asl
+    lda EntityArrayLength ;load the length of the entity array     
+    asl 
+    asl 
+    asl 
+    clc 
+    adc EntityArrayLength
+    tay ; Y = offset for next entity (Length * 9 for runtime storage)
+
+    ; Calculate source entity offset (entity number * 4 for source data)
+    ; lda Length
+    lda TempEntityNum 
+    asl 
     asl  
     tax ; X = source offset (Length * 4)
 
+
+    ;load entity data from the entities list
     ;maybe us a table with pointers pointing to the start of each entities data
 
     ;load options into the array
@@ -74,6 +65,7 @@ Index = $00
     lda Entities+1,x
     sta EntityArray+1,y
 
+    ;load the tile entry high byte
     lda Entities+2,x
     sta EntityArray+2,y
     
@@ -87,22 +79,19 @@ Index = $00
     sta EntityArray+4,y
 
     ;set the position of the entity to 0 (16 bites per coordinate)
-    ;X position
-    lda #$00
+    ;clear the position
+    lda #$00 
+
+    ;set X position
     sta EntityArray+5,y
     sta EntityArray+6,y
     
-    ;Y position
+    ;set Y position
     sta EntityArray+7,y
     sta EntityArray+8,y
 
   
     inc EntityArrayLength
-
-
-    
-    tya 
-    sta Length
 rts 
 
 @increaser:

@@ -22,21 +22,25 @@ EntityLlength = 4
 
 Entities:
 .byte 00000001 ;status byte
-.byte 00       ; 
+.byte 01     ; 
+.byte 00
 ; .addr Animations
 .addr PLAYERPHYSICS
 
 .byte 00000001 ;status byte
-.byte 03       ; 
+.byte 03       ;
+.byte 00 
 ; .addr Animations
 .addr FLYPHYSICS
 
 .byte 00000001 ;status byte
 .byte 01       ; 
+.byte 00
 .addr PLAYERPHYSICS
 
 .byte 00000001 ;status byte
 .byte 03       ;
+.byte 00     
 .addr FLYPHYSICS
 
 

@@ -38,14 +38,15 @@ LOAD:
     lda #$01
     sta Loaded
     
+    ; Load entities into the entity array
     ldx #$00
     jsr LOADENTITIE
 
 
-    ldx #$04
+    ldx #$01
     jsr LOADENTITIE
 
-    ldx #$08
+    ldx #$02
     jsr LOADENTITIE
 
     ; ldx #$0C

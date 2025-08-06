@@ -123,9 +123,9 @@ rts
         sta AnimationAddress
 
 
-        ldy #$00
-        lda (AnimationAddress), y
-        sta metaSpriteIndex
+        ; ldy #$00
+        ; lda (AnimationAddress), y
+        ; sta metaSpriteIndex
 
         inc metaSpriteSlot
         jsr LOAD_META_SPRITE

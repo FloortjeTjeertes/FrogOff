@@ -76,21 +76,21 @@ SELECTENTITY:
  
  ldy SelectedEntityIndex
  ;Adress 2 bytes (word) in standard least significant byte first format
- lda EntityArray+2 ,y
- sta Adress
  lda EntityArray+3 ,y
+ sta Adress
+ lda EntityArray+4 ,y
  sta Adress+1
 
  ;Xposition 2 bytes (word)
- lda EntityArray+5 ,y
- sta xpos
  lda EntityArray+6 ,y
+ sta xpos
+ lda EntityArray+7 ,y
  sta xpos+1
 
  ;Yposition 2 bytes (word)
- lda EntityArray+7 ,y
- sta ypos
  lda EntityArray+8 ,y
+ sta ypos
+ lda EntityArray+9 ,y
  sta ypos+1
 
 rts
