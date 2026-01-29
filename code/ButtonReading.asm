@@ -30,7 +30,7 @@ CONTROLLER =$2000
     sta JOYPAD1 ;write aculumator (0) to joypad 1 (clears strobe bit and controller will keep stored value (pressed @buttons) static
     :                                                                    
       lda JOYPAD1 ;read joypad 1 into acumulator                           
-      lsr a ;shift left shifts red byte to form a full 8 bits of the read controller                                                
+      lsr a ;left shifts red byte to form a full 8 bits of the read controller                                                
       rol @buttons ;shift left to eventually put 1 in carry (looping trough all bits in the @buttons variable)      
     bcc :- ;branch to last ":" if carry flag is not set
     
