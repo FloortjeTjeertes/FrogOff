@@ -51,21 +51,20 @@ GetBackgroundFromArray:
 rts
 
 LoadBackgroundPalletes:
-  ldy #$00
-  :
-
-  lda (PalleteAddress), y
-  sta $2007 ; PPUDATA memory address to wright data to ppu (ppu puts this value in the adress defined in memory address from $2006) ppu auto increments memory address in $2006 on every wright in $2007
-  iny 
-  cpy #$10
-  bne :-
-
+  ; reset the PPU address latch before writing the palette address
+  bit $2002
   lda #$3F
-  sta $2006 ;store most significant value 3f in ppu write address 3f.. (the adress where you store the address you want to write too in the ppu)
+  sta $2006
   lda #$00
-  sta $2006 ;store least significant value 00 in ppu write address ..00
-  sta $2006 ;store least significant value 00 in ppu write address ..00
-  sta $2006 ;store least significant value 00 in ppu write address ..00
+  sta $2006
+
+  ldy #$00
+LoadBackgroundPalletesLoop:
+  lda (PalleteAddress), y
+  sta $2007 ; write palette byte into PPU palette memory
+  iny
+  cpy #$10
+  bne LoadBackgroundPalletesLoop
 
 rts
 
