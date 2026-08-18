@@ -22,7 +22,7 @@ temp = $00
 
 rts
 
-;uses y as index to get the background from the array
+; ;uses y as index to get the background from the array
 GetBackgroundFromArray:
   sta temp
   cpy temp

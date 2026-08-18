@@ -111,12 +111,14 @@ CLRMEM:
   lda #%00011110   ;enable sprites and backgrounds for left most 8 pixels
   sta PPUMASK
   sta PPUMask ;shadow of PPUMASK (soft $2001)
+  JMP GAMECODESTART
 
 
 
 .segment "CODE"
-
 ;program loop
+GAMECODESTART:
+
 
 ; clear c and y
   ldx #$00
@@ -126,6 +128,7 @@ CLRMEM:
 
 lda #$00
 sta Mode
+ 
 
 LOOP:
 

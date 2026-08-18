@@ -3,7 +3,7 @@ objdir = bin
 outnes = $(objdir)/$(outputname).nes
 OfileList = $(wildcard $(objdir)/*.o)
 asmSources = $(shell find code -name '*.asm')
-objFiles = $(patsubst code/%.asm,$(objdir)/%.o,$(asmSources))
+objFiles = $(objdir)/nes.o $(filter-out $(objdir)/nes.o,$(patsubst code/%.asm,$(objdir)/%.o,$(asmSources)))
 
 .PHONY: all clean run
 

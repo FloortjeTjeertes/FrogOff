@@ -9,9 +9,7 @@ OptionSteps = 18
 
 .proc TITLESCREEN
 
-.segment "LOCAL"
-    TitleScreenLoaded: .res 1
-    TitleScreenOptions: .res 1
+   
 
 .segment "ZEROPAGE"
      
@@ -22,7 +20,8 @@ OptionSteps = 18
     ;imports from ButtonReading.asm
     .importzp PRESSEDBUTTONS1, RELEASEDBUTTONS1
     Mode:  .res 1
-
+    TitleScreenLoaded: .res 1
+    TitleScreenOptions: .res 1
 .code
    .import LOADBACKGROUND
    .import LOAD_META_SPRITE
