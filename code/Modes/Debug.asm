@@ -7,13 +7,13 @@
 .proc DEBUG
 .zeropage
     .importzp PPUMask
-    Loaded: .res 1
+    DebugLoaded: .res 1
 
 .segment "CODE"
  
 
 
-  ldx Loaded
+  ldx DebugLoaded
     cpx #$00
     beq @Load
     bne @Continue
@@ -36,7 +36,7 @@ LOAD:
     sta PPUMask
 
     lda #$01
-    sta Loaded
+    sta DebugLoaded
     
     ; Load entities into the entity array
     ldx #$00

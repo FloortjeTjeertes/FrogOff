@@ -10,8 +10,8 @@ OptionSteps = 18
 .proc TITLESCREEN
 
 .segment "LOCAL"
-    Loaded: .res 1
-    Options: .res 1
+    TitleScreenLoaded: .res 1
+    TitleScreenOptions: .res 1
 
 .segment "ZEROPAGE"
      
@@ -30,7 +30,7 @@ OptionSteps = 18
 
 
     
-    ldx Loaded
+    ldx TitleScreenLoaded
     cpx #$00
     beq @Load
     bne @Continue
@@ -84,10 +84,10 @@ rts
     sta PPUMask
 
     lda #$01
-    sta Loaded
+    sta TitleScreenLoaded
 
     lda #$00
-    sta Options
+    sta TitleScreenOptions
  rts 
 
  ControllerAction:
@@ -111,28 +111,28 @@ rts
  rts 
  
  StartOption:
-   ldx Options
+   ldx TitleScreenOptions
    inx 
    stx Mode
  rts 
 
  NextOption:
    
-    lda Options
+    lda TitleScreenOptions
     clc 
     cmp #$01
     beq :+
-     inc Options
+     inc TitleScreenOptions
      jsr NextFlyPosition
     :
  rts 
 
  PreviousOption:
-    lda Options
+    lda TitleScreenOptions
     clc 
     cmp #$00
     beq :+
-      dec Options
+      dec TitleScreenOptions
       jsr PreviousFlyPosition
     :
  rts 

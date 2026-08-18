@@ -10,16 +10,22 @@ OAM_END = $02FF
   .exportzp  metaSpriteSlot := $01
   .exportzp  TotalSpriteLength := $50
   .importzp  xpos, ypos
+  .importzp SpriteTableSlot1, SpriteTableSlot2, SpriteTableSlot3, SpriteTableSlot4
   ; local variables
   Meta_Sprite_Start_Address_last_byte: .res 1
   Meta_Sprite_Start_Address_first_byte: .res 1
-  MetaSpriteAtributeAddress: .res 2
+  MetaSpriteAttributeAddress: .res 2
   MetaSpriteXPositionAddress: .res 2
   MetaSpriteYPositionAddress: .res 2
+  MetaSpritePalletteID: .res 1
   metaSpriteLength: .res 1
   ; TotalSpriteLength: .res 1
   metaOffset: .res 1
-  temp: .res 1
+  metaSpritePalletteIndex: .res 1
+  spriteSlotOffset: .res 1
+  softwarePalletId: .res 1
+  hardwarePalletId: .res 1
+
 .segment "CODE"
 .proc LOAD_META_SPRITE
 
@@ -33,15 +39,18 @@ OAM_END = $02FF
 
 
   ;get the offset of the meta sprite
-  getLengthOfsetOfSprite:
+  getLengthOffsetOfSprite:
     cpy  metaSpriteIndex               ; Initialize X register
     beq :+ 
     ; increment once for the length
     inx 
-    ;increment 2 times for the tilde data adress
+    ;increment 2 times for the tilde data address
     inx 
     inx 
-    ;increment 2 times for the atributes
+    ;increment 1 time for the palette
+    inx
+
+    ;increment 2 times for the attributes
     inx 
     inx 
     ;increment 2 times for the x position
@@ -59,7 +68,7 @@ OAM_END = $02FF
     ; inc metaOffset
     ; inc metaOffset
 
-  jmp getLengthOfsetOfSprite
+  jmp getLengthOffsetOfSprite
   :
 
 
@@ -70,17 +79,47 @@ OAM_END = $02FF
   ; Load meta sprite tiles
   lda META_LOOKUP_TABLE, x      ;store length first
   sta metaSpriteLength     
-  ;load the adress of the meta sprite                  
+  ;load the address of the meta sprite                  
   lda META_LOOKUP_TABLE+1, x   ; load the second part of where the tile data is stored
   sta Meta_Sprite_Start_Address_last_byte
   lda META_LOOKUP_TABLE+2, x   ; load the first part of where the tile data is stored
   sta Meta_Sprite_Start_Address_first_byte  
   
-  ; load metasprite Atributes
+
+   ;Load the character palette
+   lda #$00
+   sta hardwarePalletId  ;zero out harwarePalletId
+
+   lda META_SPRITE_PALETTES+1
+   sta softwarePalletId
+  
+   cmp SpriteTableSlot1
+   bne :+
+   inc hardwarePalletId
+
+   cmp SpriteTableSlot2
+   bne :+
+   inc hardwarePalletId
+
+   cmp SpriteTableSlot3
+   bne :+
+   inc hardwarePalletId
+
+
+   cmp SpriteTableSlot4
+   bne :+
+   inc hardwarePalletId
+   ;check if character palette doesn't already exist
+   ;check if marked for overwrite
+   ;write palette
+   ;temp store palette index
+  :
+
+  ; load metasprite Attributes
   lda META_LOOKUP_TABLE+3, x
-  sta MetaSpriteAtributeAddress           
+  sta MetaSpriteAttributeAddress           
   lda META_LOOKUP_TABLE+4, x
-  sta MetaSpriteAtributeAddress+1    
+  sta MetaSpriteAttributeAddress+1    
 
   ; load metasprite X position
   lda META_LOOKUP_TABLE+5, x
@@ -100,7 +139,7 @@ OAM_END = $02FF
   ldy #$00                    
   ldx #$00 
   lda #$00
-  sta temp
+  sta spriteSlotOffset
 
   SetSpriteSlot:
    
@@ -110,16 +149,16 @@ OAM_END = $02FF
     ; beq EndSetSpriteSlot 
     ldx #$00       
       :
-         lda temp
+         lda spriteSlotOffset
          clc 
         ;  cpx metaSpriteLength
          cpx TotalSpriteLength
          beq :+
          inx  
-         inc temp
-         inc temp
-         inc temp
-         inc temp
+         inc spriteSlotOffset
+         inc spriteSlotOffset
+         inc spriteSlotOffset
+         inc spriteSlotOffset
          ;jump to the start of the loop
          jmp :- 
       :    
@@ -148,16 +187,22 @@ OAM_END = $02FF
     ; Store the Y position in the OAM address register
     lda (MetaSpriteYPositionAddress),y   
     adc ypos
-    sta OAM_START,x                  
+    sta OAM_START,x 
+
+
     ; Load the attribute data
     ; Store the attribute data in the $0200 range
-    lda (MetaSpriteAtributeAddress),y         
+    lda (MetaSpriteAttributeAddress),y         
     sta OAM_START+2,x                 
     ; Load the X position data
     ; Store the X position in the $0200 range
     lda (MetaSpriteXPositionAddress),y      
     adc xpos
-    sta OAM_START+3,x                 
+    sta OAM_START+3,x     
+
+   
+
+
 
     ; Increment X register to load the next tile                          
     inx  
